@@ -17,14 +17,15 @@ class stock_sum():
     __floder 报表源目录
     --------------
     """
-    def __init__(self, year, month_day, bb_floder):
+    def __init__(self, year, month_day, bb_floder, output_path):
         self.__year = year
         self.__m_d = month_day
         self.__floder = bb_floder
+        self.__out = output_path
         self.__today = str(datetime.now())[:10]
 
     def summary_report(self):
-        stock_list_path = os.path.join(self.__floder, '股票列表%s.csv' % (self.__today))
+        stock_list_path = os.path.join(self.__out, '股票列表%s.csv' % (self.__today))
 
         if not os.path.exists(stock_list_path):
             data = tushare.get_stock_basics()
@@ -47,10 +48,11 @@ class stock_sum():
         data = self.__add_cwbb_data(data, self.__year)
 
         data.to_csv(
-            os.path.join(self.__floder, '%s%s财务指标分析汇总.csv' % (self.__year, self.__m_d)), encoding='utf-8')
+            os.path.join(self.__out, '%s%s财务指标分析汇总.csv' % (self.__year, self.__m_d)), encoding='utf-8')
 
     def get_summary_report_data(self):
-        report_path = os.path.join(self.__floder, '%s%s财务指标分析汇总.csv' % (self.__year, self.__m_d))
+        self.__create_folder_if_need(self.__out)
+        report_path = os.path.join(self.__out, '%s%s财务指标分析汇总.csv' % (self.__year, self.__m_d))
         if not os.path.exists(report_path):
             self.summary_report()
 

@@ -5,7 +5,7 @@ import pandas as pd
 import tushare as ts
 from stock_analysis.stock_sum import stock_sum
 
-current_folder = os.path.dirname(os.path.abspath(__file__))
+out_folder = os.path.dirname(os.path.abspath(__file__)) + '/out'
 
 s_sum = None
 
@@ -48,14 +48,14 @@ def filter_stock_by_cwbb(year):
         gplb = gplb[gplb['现金及现金等价物的净增加额(万元)' + str(i)] + gplb['净利润(万元)' + str(i)] > 0]
         gplb = gplb[gplb['净利润(万元)' + str(i)] > 0]
 
-    file = os.path.join(current_folder, '%s%s财务报表筛选后的公司%s.csv' % (calcu_end_year, month_day, today))
+    file = os.path.join(out_folder, '%s%s财务报表筛选后的公司%s.csv' % (calcu_end_year, month_day, today))
     gplb.to_csv(file, encoding='utf-8')
 
 def filter_stock_by_average_pe(src_path, min, max):
     gplb = pd.read_csv(src_path, index_col=0, encoding='utf-8')
 
     # 获取当前股票价格
-    price_path = os.path.join(current_folder, '股票价格%s.csv' % (today))
+    price_path = os.path.join(out_folder, '股票价格%s.csv' % (today))
     if not os.path.exists(price_path):
         ts.get_today_all().set_index('code').to_csv(price_path, encoding="utf-8")
 
@@ -81,7 +81,7 @@ def filter_stock_by_average_pe(src_path, min, max):
     data['总股本'] = data['总股本'].round()
     data['流通股本'] = data['流通股本'].round()
     average_pe_file = \
-        os.path.join(current_folder, '%s%s-3年平均市盈率在%s和%s之间的公司%s.xlsx' % (calcu_end_year, month_day, min, max, today))
+        os.path.join(out_folder, '%s%s-3年平均市盈率在%s和%s之间的公司%s.xlsx' % (calcu_end_year, month_day, min, max, today))
     data.to_excel(average_pe_file)
 
 
@@ -100,10 +100,10 @@ if __name__ == '__main__':
 
     max_pe = int(input('输入最大市盈率：\n'))
 
-    s_sum = stock_sum(calcu_end_year, month_day, 'finance')
+    s_sum = stock_sum(calcu_end_year, month_day, os.path.dirname(os.path.abspath(__file__)) + '/finance', out_folder)
 
     filter_stock_by_cwbb(calcu_end_year)
 
     filter_stock_by_average_pe(
-        os.path.join(current_folder, '%s%s财务报表筛选后的公司%s.csv' % (calcu_end_year, month_day, today))
+        os.path.join(out_folder, '%s%s财务报表筛选后的公司%s.csv' % (calcu_end_year, month_day, today))
         , 1, max_pe)  # 这个函数是根据平均pe过滤股票
