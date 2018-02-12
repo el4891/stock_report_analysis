@@ -6,6 +6,7 @@ import tushare as ts
 from stock_analysis.stock_sum import stock_sum
 
 out_folder = os.path.dirname(os.path.abspath(__file__)) + '/out'
+stock_report_dir = os.path.dirname(os.path.abspath(__file__)) + '/finance'
 
 s_sum = None
 
@@ -100,7 +101,7 @@ if __name__ == '__main__':
 
     max_pe = int(input('输入最大市盈率：\n'))
 
-    s_sum = stock_sum(calcu_end_year, month_day, os.path.dirname(os.path.abspath(__file__)) + '/finance', out_folder)
+    s_sum = stock_sum(calcu_end_year, month_day, stock_report_dir, out_folder)
 
     filter_stock_by_cwbb(calcu_end_year)
 
