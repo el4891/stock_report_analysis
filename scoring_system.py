@@ -179,7 +179,7 @@ def filter_stock_by_cwbb(year):
 
     gplb = score_func(gplb, year)
 
-    gplb = gplb[gplb['评分'] > 300]
+    gplb = gplb[gplb['评分'] > 358]
 
     file = os.path.join(out_folder, '%s%s财务报表评分后的公司%s.csv' % (calcu_end_year, month_day, today))
     gplb.to_csv(file, encoding='utf-8')
