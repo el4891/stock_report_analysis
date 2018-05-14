@@ -88,17 +88,17 @@ class stock_sum():
             sleep(1.5)  # 间隔一段时间，防止服务器关闭连接
 
     def __add_cwbb_data(self, data, year):
-        add_list = ['经营活动产生的现金流量净额(万元)' + str(year), '经营活动产生的现金流量净额(万元)' + str(year - 1),
-                    '经营活动产生的现金流量净额(万元)' + str(year - 2), '投资活动产生的现金流量净额(万元)' + str(year),
-                    '投资活动产生的现金流量净额(万元)' + str(year - 1), '投资活动产生的现金流量净额(万元)' + str(year - 2),
-                    '筹资活动产生的现金流量净额(万元)' + str(year), '筹资活动产生的现金流量净额(万元)' + str(year - 1),
-                    '筹资活动产生的现金流量净额(万元)' + str(year - 2), '现金及现金等价物的净增加额(万元)' + str(year),
-                    '现金及现金等价物的净增加额(万元)' + str(year - 1), '现金及现金等价物的净增加额(万元)' + str(year - 2), '有息负债(万元)', '非主业资产(万元)',
-                    '生产资产(万元)', '货币资金(万元)', '应收款(万元)', '其他应收款(万元)', '其他应付款(万元)', '利润总额(万元)', '净利润(万元)' + str(year),
-                    '净利润(万元)' + str(year - 1), '净利润(万元)' + str(year - 2), '营业总收入(万元)', '营业外收入(万元)', '营业总成本(万元)',
-                    '营业外支出(万元)', '资产减值损失(万元)', '费用总和(万元)', '平均利润(万元)']
+        # add_list = ['经营活动产生的现金流量净额(万元)' + str(year), '经营活动产生的现金流量净额(万元)' + str(year - 1),
+        #             '经营活动产生的现金流量净额(万元)' + str(year - 2), '投资活动产生的现金流量净额(万元)' + str(year),
+        #             '投资活动产生的现金流量净额(万元)' + str(year - 1), '投资活动产生的现金流量净额(万元)' + str(year - 2),
+        #             '筹资活动产生的现金流量净额(万元)' + str(year), '筹资活动产生的现金流量净额(万元)' + str(year - 1),
+        #             '筹资活动产生的现金流量净额(万元)' + str(year - 2), '现金及现金等价物的净增加额(万元)' + str(year),
+        #             '现金及现金等价物的净增加额(万元)' + str(year - 1), '现金及现金等价物的净增加额(万元)' + str(year - 2), '有息负债(万元)', '非主业资产(万元)',
+        #             '生产资产(万元)', '货币资金(万元)', '应收款(万元)', '其他应收款(万元)', '其他应付款(万元)', '利润总额(万元)', '净利润(万元)' + str(year),
+        #             '净利润(万元)' + str(year - 1), '净利润(万元)' + str(year - 2), '营业总收入(万元)', '营业外收入(万元)', '营业总成本(万元)',
+        #             '营业外支出(万元)', '资产减值损失(万元)', '费用总和(万元)', '平均利润(万元)']
 
-        pd.concat([data, pd.DataFrame(columns=add_list)])
+        # pd.concat([data, pd.DataFrame(columns=add_list)])
 
         for index, row in data.iterrows():
             try:
@@ -128,71 +128,104 @@ class stock_sum():
                 zcfzb_data = pd.read_csv(os.path.join(os.path.join(self.__floder, 'zcfzb'), code + '.csv'), encoding='gbk', index_col=0)
                 zcfzb_data = zcfzb_data.T
 
-                data.loc[index, '有息负债(万元)'] = \
-                    float('--' == zcfzb_data['短期借款(万元)'][str(year) + self.__m_d] and 0.00001 or zcfzb_data['短期借款(万元)'][str(year) + self.__m_d]) \
-                    + float('--' == zcfzb_data['长期借款(万元)'][str(year) + self.__m_d] and 0.00001 or zcfzb_data['长期借款(万元)'][str(year) + self.__m_d]) \
-                    + float('--' == zcfzb_data['应付债券(万元)'][str(year) + self.__m_d] and 0.00001 or zcfzb_data['应付债券(万元)'][str(year) + self.__m_d])
+                for i in range(year - 2, year + 1):
+                    data.loc[index, '有息负债(万元)' + str(i)] = \
+                        float('--' == zcfzb_data['短期借款(万元)'][str(i) + self.__m_d] and 0.00001 or
+                              zcfzb_data['短期借款(万元)'][str(i) + self.__m_d]) \
+                        + float('--' == zcfzb_data['长期借款(万元)'][str(i) + self.__m_d] and 0.00001 or
+                                zcfzb_data['长期借款(万元)'][str(i) + self.__m_d]) \
+                        + float('--' == zcfzb_data['应付债券(万元)'][str(i) + self.__m_d] and 0.00001 or
+                                zcfzb_data['应付债券(万元)'][str(i) + self.__m_d])
 
-                data.loc[index, '非主业资产(万元)'] = \
-                    float('--' == zcfzb_data['可供出售金融资产(万元)'][str(year) + self.__m_d] and 0.00001 or zcfzb_data['可供出售金融资产(万元)'][str(year) + self.__m_d]) \
-                    + float('--' == zcfzb_data['持有至到期投资(万元)'][str(year) + self.__m_d] and 0.00001 or zcfzb_data['持有至到期投资(万元)'][str(year) + self.__m_d])
+                    data.loc[index, '非主业资产(万元)' + str(i)] = \
+                        float('--' == zcfzb_data['可供出售金融资产(万元)'][str(i) + self.__m_d] and 0.00001 or
+                              zcfzb_data['可供出售金融资产(万元)'][str(i) + self.__m_d]) \
+                        + float('--' == zcfzb_data['持有至到期投资(万元)'][str(i) + self.__m_d] and 0.00001 or
+                                zcfzb_data['持有至到期投资(万元)'][str(i) + self.__m_d])
 
-                data.loc[index, '生产资产(万元)'] = \
-                    float('--' == zcfzb_data['固定资产(万元)'][str(year) + self.__m_d] and 0.00001 or zcfzb_data['固定资产(万元)'][str(year) + self.__m_d]) \
-                    + float('--' == zcfzb_data['在建工程(万元)'][str(year) + self.__m_d] and 0.00001 or zcfzb_data['在建工程(万元)'][str(year) + self.__m_d]) \
-                    + float('--' == zcfzb_data['工程物资(万元)'][str(year) + self.__m_d] and 0.00001 or zcfzb_data['工程物资(万元)'][str(year) + self.__m_d])
+                    data.loc[index, '生产资产(万元)' + str(i)] = \
+                        float('--' == zcfzb_data['固定资产(万元)'][str(i) + self.__m_d] and 0.00001 or
+                              zcfzb_data['固定资产(万元)'][str(i) + self.__m_d]) \
+                        + float('--' == zcfzb_data['在建工程(万元)'][str(i) + self.__m_d] and 0.00001 or
+                                zcfzb_data['在建工程(万元)'][str(i) + self.__m_d]) \
+                        + float('--' == zcfzb_data['工程物资(万元)'][str(i) + self.__m_d] and 0.00001 or
+                                zcfzb_data['工程物资(万元)'][str(i) + self.__m_d])
 
-                data.loc[index, '货币资金(万元)'] = \
-                    float('--' == zcfzb_data['货币资金(万元)'][str(year) + self.__m_d] and 0.00001 or zcfzb_data['货币资金(万元)'][str(year) + self.__m_d])
+                    data.loc[index, '货币资金(万元)' + str(i)] = \
+                        float('--' == zcfzb_data['货币资金(万元)'][str(i) + self.__m_d] and 0.00001 or
+                              zcfzb_data['货币资金(万元)'][str(i) + self.__m_d])
 
-                data.loc[index, '其他应收款(万元)'] = \
-                    float('--' == zcfzb_data['其他应收款(万元)'][str(year) + self.__m_d] and 0.00001 or zcfzb_data['其他应收款(万元)'][str(year) + self.__m_d])
+                    data.loc[index, '其他应收款(万元)' + str(i)] = \
+                        float('--' == zcfzb_data['其他应收款(万元)'][str(i) + self.__m_d] and 0.00001 or
+                              zcfzb_data['其他应收款(万元)'][str(i) + self.__m_d])
 
-                data.loc[index, '其他应付款(万元)'] = \
-                    float('--' == zcfzb_data['其他应付款(万元)'][str(year) + self.__m_d] and 0.00001 or zcfzb_data['其他应付款(万元)'][str(year) + self.__m_d])
+                    data.loc[index, '其他应付款(万元)' + str(i)] = \
+                        float('--' == zcfzb_data['其他应付款(万元)'][str(i) + self.__m_d] and 0.00001 or
+                              zcfzb_data['其他应付款(万元)'][str(i) + self.__m_d])
 
-                data.loc[index, '应收款(万元)'] = \
-                    float('--' == zcfzb_data['应收票据(万元)'][str(year) + self.__m_d] and 0.00001 or zcfzb_data['应收票据(万元)'][str(year) + self.__m_d]) \
-                    + float('--' == zcfzb_data['应收账款(万元)'][str(year) + self.__m_d] and 0.00001 or zcfzb_data['应收账款(万元)'][str(year) + self.__m_d]) \
-                    + float('--' == zcfzb_data['其他应收款(万元)'][str(year) + self.__m_d] and 0.00001 or zcfzb_data['其他应收款(万元)'][str(year) + self.__m_d])
+                    data.loc[index, '应收款(万元)' + str(i)] = \
+                        float('--' == zcfzb_data['应收票据(万元)'][str(i) + self.__m_d] and 0.00001 or
+                              zcfzb_data['应收票据(万元)'][str(i) + self.__m_d]) \
+                        + float('--' == zcfzb_data['应收账款(万元)'][str(i) + self.__m_d] and 0.00001 or
+                                zcfzb_data['应收账款(万元)'][str(i) + self.__m_d]) \
+                        + float('--' == zcfzb_data['其他应收款(万元)'][str(i) + self.__m_d] and 0.00001 or
+                                zcfzb_data['其他应收款(万元)'][str(i) + self.__m_d])
+
+                    data.loc[index, '资产总计(万元)' + str(i)] = \
+                        float('--' == zcfzb_data['资产总计(万元)'][str(i) + self.__m_d] and 0.00001 \
+                              or zcfzb_data['资产总计(万元)'][str(i) + self.__m_d])
 
                 lrb_data = pd.read_csv(os.path.join(os.path.join(self.__floder, 'lrb'), code + '.csv'), encoding='gbk', index_col=0)
                 lrb_data = lrb_data.T
 
                 average_profit = 0
                 for i in range(year - 2, year + 1):
+                    data.loc[index, '利润总额(万元)' + str(i)] = \
+                        float('--' == lrb_data['利润总额(万元)'][str(i) + self.__m_d] and 0.00001 or lrb_data['利润总额(万元)'][
+                            str(i) + self.__m_d])
+
+                    data.loc[index, '营业总收入(万元)' + str(i)] = \
+                        float(
+                            '--' == lrb_data['营业总收入(万元)'][str(i) + self.__m_d] and 0.00001 or lrb_data['营业总收入(万元)'][
+                                str(i) + self.__m_d])
+
+                    data.loc[index, '营业外收入(万元)' + str(i)] = \
+                        float(
+                            '--' == lrb_data['营业外收入(万元)'][str(i) + self.__m_d] and 0.00001 or lrb_data['营业外收入(万元)'][
+                                str(i) + self.__m_d])
+
+                    data.loc[index, '营业总成本(万元)' + str(i)] = \
+                        float(
+                            '--' == lrb_data['营业总成本(万元)'][str(i) + self.__m_d] and 0.00001 or lrb_data['营业总成本(万元)'][
+                                str(i) + self.__m_d])
+
+                    data.loc[index, '营业外支出(万元)' + str(i)] = \
+                        float(
+                            '--' == lrb_data['营业外支出(万元)'][str(i) + self.__m_d] and 0.00001 or lrb_data['营业外支出(万元)'][
+                                str(i) + self.__m_d])
+
+                    data.loc[index, '资产减值损失(万元)' + str(i)] = \
+                        float('--' == lrb_data['资产减值损失(万元)'][str(i) + self.__m_d] and 0.00001 or lrb_data['资产减值损失(万元)'][str(i) + self.__m_d])
+
+                    data.loc[index, '费用总和(万元)' + str(i)] = \
+                        float('--' == lrb_data['销售费用(万元)'][str(i) + self.__m_d] and 0.00001 or lrb_data['销售费用(万元)'][str(i) + self.__m_d]) \
+                        + float('--' == lrb_data['管理费用(万元)'][str(i) + self.__m_d] and 0.00001 or lrb_data['管理费用(万元)'][str(i) + self.__m_d]) \
+                        + float('--' == lrb_data['财务费用(万元)'][str(i) + self.__m_d] and 0.00001 or lrb_data['财务费用(万元)'][str(i) + self.__m_d]) \
+                        + float('--' == lrb_data['研发费用(万元)'][str(i) + self.__m_d] and 0.00001 or lrb_data['研发费用(万元)'][str(i) + self.__m_d]) \
+                        + float('--' == lrb_data['分保费用(万元)'][str(i) + self.__m_d] and 0.00001 or lrb_data['分保费用(万元)'][str(i) + self.__m_d])
+
                     data.loc[index, '净利润(万元)' + str(i)] = \
                         float('--' == lrb_data['净利润(万元)'][str(i) + self.__m_d]
                               and 0.00001 or lrb_data['净利润(万元)'][str(i) + self.__m_d])
 
                     average_profit += data['净利润(万元)' + str(i)][index]
 
+                    data.loc[index, '毛利率(%)' + str(i)] = \
+                        (float('--' == lrb_data['营业总收入(万元)'][str(i) + self.__m_d] and 0.00001 or lrb_data['营业总收入(万元)'][str(i) + self.__m_d]) \
+                         - float('--' == lrb_data['营业总成本(万元)'][str(i) + self.__m_d] and 0.00001 or lrb_data['营业总成本(万元)'][str(i) + self.__m_d])) \
+                        / float('--' == lrb_data['营业总收入(万元)'][str(i) + self.__m_d] and 0.00001 or lrb_data['营业总收入(万元)'][str(i) + self.__m_d]) * 100
+
                 data.loc[index, '平均利润(万元)'] = average_profit / 3
-
-                data.loc[index, '利润总额(万元)'] = \
-                    float('--' == lrb_data['利润总额(万元)'][str(year) + self.__m_d] and 0.00001 or lrb_data['利润总额(万元)'][str(year) + self.__m_d])
-
-                data.loc[index, '营业总收入(万元)'] = \
-                    float('--' == lrb_data['营业总收入(万元)'][str(year) + self.__m_d] and 0.00001 or lrb_data['营业总收入(万元)'][str(year) + self.__m_d])
-
-                data.loc[index, '营业外收入(万元)'] = \
-                    float('--' == lrb_data['营业外收入(万元)'][str(year) + self.__m_d] and 0.00001 or lrb_data['营业外收入(万元)'][str(year) + self.__m_d])
-
-                data.loc[index, '营业总成本(万元)'] = \
-                    float('--' == lrb_data['营业总成本(万元)'][str(year) + self.__m_d] and 0.00001 or lrb_data['营业总成本(万元)'][str(year) + self.__m_d])
-
-                data.loc[index, '营业外支出(万元)'] = \
-                    float('--' == lrb_data['营业外支出(万元)'][str(year) + self.__m_d] and 0.00001 or lrb_data['营业外支出(万元)'][str(year) + self.__m_d])
-
-                data.loc[index, '资产减值损失(万元)'] = \
-                    float('--' == lrb_data['资产减值损失(万元)'][str(year) + self.__m_d] and 0.00001 or lrb_data['资产减值损失(万元)'][str(year) + self.__m_d])
-
-                data.loc[index, '费用总和(万元)'] = \
-                    float('--' == lrb_data['销售费用(万元)'][str(year) + self.__m_d] and 0.00001 or lrb_data['销售费用(万元)'][str(year) + self.__m_d]) \
-                    + float('--' == lrb_data['管理费用(万元)'][str(year) + self.__m_d] and 0.00001 or lrb_data['管理费用(万元)'][str(year) + self.__m_d]) \
-                    + float('--' == lrb_data['财务费用(万元)'][str(year) + self.__m_d] and 0.00001 or lrb_data['财务费用(万元)'][str(year) + self.__m_d]) \
-                    + float('--' == lrb_data['研发费用(万元)'][str(year) + self.__m_d] and 0.00001 or lrb_data['研发费用(万元)'][str(year) + self.__m_d]) \
-                    + float('--' == lrb_data['分保费用(万元)'][str(year) + self.__m_d] and 0.00001 or lrb_data['分保费用(万元)'][str(year) + self.__m_d])
 
             except Exception as e:
                 print(code)

@@ -23,111 +23,103 @@ def score_func(data, year):
     for index, row in data.iterrows():
         scroe_sum = 0
 
-        tiaojian = row['利润总额(万元)'] / row['生产资产(万元)'] 
-        if tiaojian > 0.3:
-            scroe_sum += 20
-        elif tiaojian > 0.1:
-            scroe_sum += 10
-        else:
-            scroe_sum -= 20
-
-        tiaojian = row['非主业资产(万元)'] / row['总资产(万)']
-        if tiaojian < 0.05:
-            scroe_sum += 20
-        elif tiaojian < 0.1:
-            scroe_sum += 10
-        else:
-            scroe_sum -= 20
-            
-        tiaojian = row['应收款(万元)'] / row['总资产(万)']
-        if tiaojian < 0.1:
-            scroe_sum += 50
-        elif tiaojian < 0.3:
-            scroe_sum += 20
-        else:
-            scroe_sum -= 50
-            
-        tiaojian = row['有息负债(万元)'] / row['总资产(万)']
-        if tiaojian < 0.4:
-            scroe_sum += 20
-        elif tiaojian < 0.6:
-            scroe_sum += 10
-        else:
-            scroe_sum -= 20
-        
-        tiaojian = row['其他应收款(万元)'] / row['平均利润(万元)']
-        if tiaojian < 0.05:
-            scroe_sum += 50
-        elif tiaojian < 0.2:
-            scroe_sum += 20
-        else:
-            scroe_sum -= 50
-            
-        tiaojian = row['其他应付款(万元)'] / row['平均利润(万元)']
-        if tiaojian < 0.1:
-            scroe_sum += 20
-        elif tiaojian < 0.3:
-            scroe_sum += 10
-        else:
-            scroe_sum -= 20
-            
-        tiaojian = abs(row['资产减值损失(万元)'] / row['平均利润(万元)'])
-        if tiaojian < 0.2:
-            scroe_sum += 20
-        elif tiaojian < 0.35:
-            scroe_sum += 10
-        else:
-            scroe_sum -= 20
-            
-        tiaojian = row['货币资金(万元)'] / (row['有息负债(万元)'] + 0.00001)
-        if tiaojian > 1:
-            scroe_sum += 50
-        elif tiaojian > 0.8:
-            scroe_sum += 20
-        else:
-            scroe_sum -= 50
-        
-        tiaojian = row['利润同比(%)']
-        if tiaojian > 20:
-            scroe_sum += 50
-        elif tiaojian > 0:
-            scroe_sum += 20
-        else:
-            scroe_sum -= 50
-            
-        tiaojian = abs(row['营业外收入(万元)']) / abs(row['营业总收入(万元)'])
-        if tiaojian < 0.1:
-            scroe_sum += 20
-        elif tiaojian < 0.2:
-            scroe_sum += 10
-        else:
-            scroe_sum -= 20
-        
-        tiaojian = abs(row['营业外支出(万元)']) / abs(row['营业总成本(万元)'])
-        if tiaojian < 0.1:
-            scroe_sum += 20
-        elif tiaojian < 0.2:
-            scroe_sum += 10
-        else:
-            scroe_sum -= 20
-            
-        tiaojian = row['毛利率(%)']
-        if tiaojian > 50:
-            scroe_sum += 50
-        elif tiaojian > 20:
-            scroe_sum += 20
-        else:
-            scroe_sum -= 50
-            
-        tiaojian = row['费用总和(万元)'] / (row['营业总收入(万元)'] - row['营业总成本(万元)'] + 0.00001)
-        if tiaojian < 0.6:
-            scroe_sum += 50
-        elif tiaojian < 0.8:
-            scroe_sum += 20
-        else:
-            scroe_sum -= 50
-
         for i in range(year - 2, year + 1):
+            tiaojian = row['利润总额(万元)' + str(i)] / row['生产资产(万元)' + str(i)]
+            if tiaojian > 0.3:
+                scroe_sum += 20
+            elif tiaojian > 0.1:
+                scroe_sum += 10
+            else:
+                scroe_sum -= 20
+
+            tiaojian = row['非主业资产(万元)' + str(i)] / row['资产总计(万元)' + str(i)]
+            if tiaojian < 0.05:
+                scroe_sum += 20
+            elif tiaojian < 0.1:
+                scroe_sum += 10
+            else:
+                scroe_sum -= 20
+
+            tiaojian = row['应收款(万元)' + str(i)] / row['资产总计(万元)' + str(i)]
+            if tiaojian < 0.1:
+                scroe_sum += 50
+            elif tiaojian < 0.3:
+                scroe_sum += 20
+            else:
+                scroe_sum -= 50
+
+            tiaojian = row['有息负债(万元)' + str(i)] / row['资产总计(万元)' + str(i)]
+            if tiaojian < 0.4:
+                scroe_sum += 20
+            elif tiaojian < 0.6:
+                scroe_sum += 10
+            else:
+                scroe_sum -= 20
+
+            tiaojian = row['其他应收款(万元)' + str(i)] / row['平均利润(万元)']
+            if tiaojian < 0.05:
+                scroe_sum += 50
+            elif tiaojian < 0.2:
+                scroe_sum += 20
+            else:
+                scroe_sum -= 50
+
+            tiaojian = row['其他应付款(万元)' + str(i)] / row['平均利润(万元)']
+            if tiaojian < 0.1:
+                scroe_sum += 20
+            elif tiaojian < 0.3:
+                scroe_sum += 10
+            else:
+                scroe_sum -= 20
+
+            tiaojian = abs(row['资产减值损失(万元)' + str(i)] / row['平均利润(万元)'])
+            if tiaojian < 0.2:
+                scroe_sum += 20
+            elif tiaojian < 0.35:
+                scroe_sum += 10
+            else:
+                scroe_sum -= 20
+
+            tiaojian = row['货币资金(万元)' + str(i)] / (row['有息负债(万元)' + str(i)] + 0.00001)
+            if tiaojian > 1:
+                scroe_sum += 50
+            elif tiaojian > 0.8:
+                scroe_sum += 20
+            else:
+                scroe_sum -= 50
+
+            tiaojian = abs(row['营业外收入(万元)' + str(i)]) / abs(row['营业总收入(万元)' + str(i)])
+            if tiaojian < 0.1:
+                scroe_sum += 20
+            elif tiaojian < 0.2:
+                scroe_sum += 10
+            else:
+                scroe_sum -= 20
+
+            tiaojian = abs(row['营业外支出(万元)' + str(i)]) / abs(row['营业总成本(万元)' + str(i)])
+            if tiaojian < 0.1:
+                scroe_sum += 20
+            elif tiaojian < 0.2:
+                scroe_sum += 10
+            else:
+                scroe_sum -= 20
+
+            tiaojian = row['毛利率(%)' + str(i)]
+            if tiaojian > 50:
+                scroe_sum += 50
+            elif tiaojian > 20:
+                scroe_sum += 20
+            else:
+                scroe_sum -= 50
+
+            tiaojian = row['费用总和(万元)' + str(i)] / (row['营业总收入(万元)' + str(i)] - row['营业总成本(万元)' + str(i)] + 0.00001)
+            if tiaojian < 0.6:
+                scroe_sum += 50
+            elif tiaojian < 0.8:
+                scroe_sum += 20
+            else:
+                scroe_sum -= 50
+
             tiaojian = row['经营活动产生的现金流量净额(万元)' + str(i)] / abs(row['投资活动产生的现金流量净额(万元)' + str(i)])
             if tiaojian > 2:
                 scroe_sum += 10
@@ -135,7 +127,7 @@ def score_func(data, year):
                 scroe_sum += 50
             else:
                 scroe_sum -= 10
-            
+
             tiaojian = row['经营活动产生的现金流量净额(万元)' + str(i)] / row['净利润(万元)' + str(i)]
             if tiaojian > 2:
                 scroe_sum += 30
@@ -150,6 +142,14 @@ def score_func(data, year):
             else:
                 scroe_sum -= 10
 
+        tiaojian = row['利润同比(%)']
+        if tiaojian > 20:
+            scroe_sum += 50
+        elif tiaojian > 0:
+            scroe_sum += 20
+        else:
+            scroe_sum -= 50
+
         data.loc[index, '评分'] = scroe_sum
     return data
 
@@ -157,29 +157,29 @@ def score_func(data, year):
 def filter_stock_by_cwbb(year):
     gplb = s_sum.get_summary_report_data()
 
-    gplb = gplb[gplb['利润总额(万元)'] / gplb['生产资产(万元)'] > 0.1]
-    gplb = gplb[gplb['非主业资产(万元)'] / gplb['总资产(万)'] < 0.2]
-    gplb = gplb[gplb['应收款(万元)'] / gplb['总资产(万)'] < 0.3]
-    gplb = gplb[gplb['有息负债(万元)'] / gplb['总资产(万)'] < 0.6]
-    gplb = gplb[gplb['其他应收款(万元)'] / gplb['平均利润(万元)'] < 0.3]
-    gplb = gplb[gplb['其他应付款(万元)'] / gplb['平均利润(万元)'] < 0.4]
-    gplb = gplb[abs(gplb['资产减值损失(万元)']) / gplb['平均利润(万元)'] < 0.3]
-
-    gplb = gplb[gplb['货币资金(万元)'] / gplb['有息负债(万元)'] > 1]
-    gplb = gplb[gplb['利润同比(%)'] > 0]
-    gplb = gplb[abs(gplb['营业外收入(万元)']) / abs(gplb['营业总收入(万元)']) < 0.4]
-    gplb = gplb[abs(gplb['营业外支出(万元)']) / abs(gplb['营业总成本(万元)']) < 0.4]
-    gplb = gplb[gplb['毛利率(%)'] > 20]
-
-    gplb = gplb[gplb['费用总和(万元)'] / (gplb['营业总收入(万元)'] - gplb['营业总成本(万元)']) < 1]
-
     for i in range(year - 2, year + 1):
+        gplb = gplb[gplb['利润总额(万元)' + str(i)] / gplb['生产资产(万元)' + str(i)] > 0.1]
+        gplb = gplb[gplb['非主业资产(万元)' + str(i)] / gplb['资产总计(万元)' + str(i)] < 0.2]
+        gplb = gplb[gplb['应收款(万元)' + str(i)] / gplb['资产总计(万元)' + str(i)] < 0.3]
+        gplb = gplb[gplb['有息负债(万元)' + str(i)] / gplb['资产总计(万元)' + str(i)] < 0.6]
+        gplb = gplb[gplb['其他应收款(万元)' + str(i)] / gplb['平均利润(万元)'] < 0.3]
+        gplb = gplb[gplb['其他应付款(万元)' + str(i)] / gplb['平均利润(万元)'] < 0.4]
+        gplb = gplb[abs(gplb['资产减值损失(万元)' + str(i)]) / gplb['平均利润(万元)'] < 0.3]
+
+        gplb = gplb[gplb['货币资金(万元)' + str(i)] / gplb['有息负债(万元)' + str(i)] > 1]
+        gplb = gplb[abs(gplb['营业外收入(万元)' + str(i)]) / abs(gplb['营业总收入(万元)' + str(i)]) < 0.4]
+        gplb = gplb[abs(gplb['营业外支出(万元)' + str(i)]) / abs(gplb['营业总成本(万元)' + str(i)]) < 0.4]
+        gplb = gplb[gplb['毛利率(%)' + str(i)] > 20]
+
+        gplb = gplb[gplb['费用总和(万元)' + str(i)] / (gplb['营业总收入(万元)' + str(i)] - gplb['营业总成本(万元)' + str(i)]) < 1]
+
+
         gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] > 0]
         gplb = gplb[gplb['净利润(万元)' + str(i)] > 0]
 
-    gplb = score_func(gplb, year)
+    gplb = gplb[gplb['利润同比(%)'] > 0]
 
-    gplb = gplb[gplb['评分'] > 400]
+    gplb = score_func(gplb, year)
 
     file = os.path.join(out_folder, '%s%s财务报表评分后的公司%s.csv' % (calcu_end_year, month_day, today))
     gplb.to_csv(file, encoding='utf-8')

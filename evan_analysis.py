@@ -21,33 +21,34 @@ today = str(datetime.now())[:10]
 
 def filter_stock_by_cwbb(year):
     gplb = s_sum.get_summary_report_data()
-
-    gplb = gplb[gplb['利润总额(万元)'] / gplb['生产资产(万元)'] > 0.1]
-    gplb = gplb[gplb['非主业资产(万元)'] / gplb['总资产(万)'] < 0.1]
-    gplb = gplb[gplb['应收款(万元)'] / gplb['总资产(万)'] < 0.3]
-    gplb = gplb[gplb['有息负债(万元)'] / gplb['总资产(万)'] < 0.6]
-    gplb = gplb[gplb['其他应收款(万元)'] / gplb['平均利润(万元)'] < 0.2]
-    gplb = gplb[gplb['其他应付款(万元)'] / gplb['平均利润(万元)'] < 0.35]
-    gplb = gplb[abs(gplb['资产减值损失(万元)']) / gplb['平均利润(万元)'] < 0.3]
-
-    gplb = gplb[gplb['货币资金(万元)'] / gplb['有息负债(万元)'] > 1]
-    gplb = gplb[gplb['利润同比(%)'] > 0]
-    gplb = gplb[abs(gplb['营业外收入(万元)']) / abs(gplb['营业总收入(万元)']) < 0.2]
-    gplb = gplb[abs(gplb['营业外支出(万元)']) / abs(gplb['营业总成本(万元)']) < 0.2]
-    gplb = gplb[gplb['毛利率(%)'] > 20]
-
-    gplb = gplb[gplb['费用总和(万元)'] / (gplb['营业总收入(万元)'] - gplb['营业总成本(万元)']) < 0.95]
-
-    gplb = gplb[(gplb['经营活动产生的现金流量净额(万元)' + str(year)]
-                 + gplb['经营活动产生的现金流量净额(万元)' + str(year - 1)]
-                 + gplb['经营活动产生的现金流量净额(万元)' + str(year - 2)])
-                / (gplb['净利润(万元)' + str(year)] + gplb['净利润(万元)' + str(year - 1)] + gplb['净利润(万元)' + str(year - 2)]) > 1]
-
     for i in range(year - 2, year + 1):
+        gplb = gplb[gplb['利润总额(万元)' + str(i)] / gplb['生产资产(万元)' + str(i)] > 0.1]
+        gplb = gplb[gplb['非主业资产(万元)' + str(i)] / gplb['资产总计(万元)' + str(i)] < 0.1]
+        gplb = gplb[gplb['应收款(万元)' + str(i)] / gplb['资产总计(万元)' + str(i)] < 0.3]
+        gplb = gplb[gplb['有息负债(万元)' + str(i)] / gplb['资产总计(万元)' + str(i)] < 0.6]
+        gplb = gplb[gplb['其他应收款(万元)' + str(i)] / gplb['平均利润(万元)'] < 0.2]
+        gplb = gplb[gplb['其他应付款(万元)' + str(i)] / gplb['平均利润(万元)'] < 0.35]
+        gplb = gplb[abs(gplb['资产减值损失(万元)' + str(i)]) / gplb['平均利润(万元)'] < 0.3]
+
+        gplb = gplb[gplb['货币资金(万元)' + str(i)] / gplb['有息负债(万元)' + str(i)] > 1]
+
+        gplb = gplb[abs(gplb['营业外收入(万元)' + str(i)]) / abs(gplb['营业总收入(万元)' + str(i)]) < 0.2]
+        gplb = gplb[abs(gplb['营业外支出(万元)' + str(i)]) / abs(gplb['营业总成本(万元)' + str(i)]) < 0.2]
+        gplb = gplb[gplb['毛利率(%)' + str(i)] > 20]
+
+        gplb = gplb[gplb['费用总和(万元)' + str(i)] / (gplb['营业总收入(万元)' + str(i)] - gplb['营业总成本(万元)' + str(i)]) < 0.95]
+
+        gplb = gplb[(gplb['经营活动产生的现金流量净额(万元)' + str(year)]
+                     + gplb['经营活动产生的现金流量净额(万元)' + str(year - 1)]
+                     + gplb['经营活动产生的现金流量净额(万元)' + str(year - 2)])
+                    / (gplb['净利润(万元)' + str(year)] + gplb['净利润(万元)' + str(year - 1)] + gplb['净利润(万元)' + str(year - 2)]) > 1]
+
         gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] > 0]
         gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] / abs(gplb['投资活动产生的现金流量净额(万元)' + str(i)]) > 0.5]
         gplb = gplb[gplb['现金及现金等价物的净增加额(万元)' + str(i)] + gplb['净利润(万元)' + str(i)] > 0]
         gplb = gplb[gplb['净利润(万元)' + str(i)] > 0]
+
+    gplb = gplb[gplb['利润同比(%)'] > 0]
 
     file = os.path.join(out_folder, '%s%s财务报表筛选后的公司%s.csv' % (calcu_end_year, month_day, today))
     gplb.to_csv(file, encoding='utf-8')
