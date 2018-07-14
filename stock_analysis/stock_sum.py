@@ -103,12 +103,13 @@ class stock_sum():
         for index, row in data.iterrows():
             try:
                 code = '%06d' % index
+                # print(code)
                 self.__download_report(code)
 
                 xjllb_data = pd.read_csv(os.path.join(os.path.join(self.__floder, 'xjllb'), code + '.csv'), encoding="gbk", index_col=0)
                 xjllb_data = xjllb_data.T
 
-                for i in range(year - 2, year + 1):
+                for i in range(year - 3, year + 1):
                     data.loc[index, '经营活动产生的现金流量净额(万元)' + str(i)] = \
                         float('--' == xjllb_data[' 经营活动产生的现金流量净额(万元)'][str(i) + self.__m_d]
                               and 0.00001 or xjllb_data[' 经营活动产生的现金流量净额(万元)'][str(i) + self.__m_d])
@@ -128,7 +129,7 @@ class stock_sum():
                 zcfzb_data = pd.read_csv(os.path.join(os.path.join(self.__floder, 'zcfzb'), code + '.csv'), encoding='gbk', index_col=0)
                 zcfzb_data = zcfzb_data.T
 
-                for i in range(year - 2, year + 1):
+                for i in range(year - 3, year + 1):
                     data.loc[index, '有息负债(万元)' + str(i)] = \
                         float('--' == zcfzb_data['短期借款(万元)'][str(i) + self.__m_d] and 0.00001 or
                               zcfzb_data['短期借款(万元)'][str(i) + self.__m_d]) \
@@ -179,7 +180,7 @@ class stock_sum():
                 lrb_data = lrb_data.T
 
                 average_profit = 0
-                for i in range(year - 2, year + 1):
+                for i in range(year - 3, year + 1):
                     data.loc[index, '利润总额(万元)' + str(i)] = \
                         float('--' == lrb_data['利润总额(万元)'][str(i) + self.__m_d] and 0.00001 or lrb_data['利润总额(万元)'][
                             str(i) + self.__m_d])
@@ -220,12 +221,28 @@ class stock_sum():
 
                     average_profit += data['净利润(万元)' + str(i)][index]
 
-                    data.loc[index, '毛利率(%)' + str(i)] = \
-                        (float('--' == lrb_data['营业总收入(万元)'][str(i) + self.__m_d] and 0.00001 or lrb_data['营业总收入(万元)'][str(i) + self.__m_d]) \
-                         - float('--' == lrb_data['营业总成本(万元)'][str(i) + self.__m_d] and 0.00001 or lrb_data['营业总成本(万元)'][str(i) + self.__m_d])) \
-                        / float('--' == lrb_data['营业总收入(万元)'][str(i) + self.__m_d] and 0.00001 or lrb_data['营业总收入(万元)'][str(i) + self.__m_d]) * 100
+                    try:
+                        data.loc[index, '毛利率(%)' + str(i)] = \
+                            (float('--' == lrb_data['营业总收入(万元)'][str(i) + self.__m_d] and 0.00001 or lrb_data['营业总收入(万元)'][str(i) + self.__m_d]) \
+                             - float('--' == lrb_data['营业总成本(万元)'][str(i) + self.__m_d] and 0.00001 or lrb_data['营业总成本(万元)'][str(i) + self.__m_d])) \
+                            / float(('--' == lrb_data['营业总收入(万元)'][str(i) + self.__m_d] or 0 == lrb_data['营业总收入(万元)'][str(i) + self.__m_d]) and 0.00001 or lrb_data['营业总收入(万元)'][str(i) + self.__m_d]) * 100
+
+                    except Exception as e:
+                        data.loc[index, '毛利率(%)' + str(i)] = -10.0
 
                 data.loc[index, '平均利润(万元)'] = average_profit / 3
+
+                for i in range(year - 2, year + 1):
+                    lirun_now = float(data['净利润(万元)' + str(i)][index])
+                    lirun_lastyear = float(data['净利润(万元)' + str(i - 1)][index])
+
+                    if not isinstance(lirun_lastyear, float) or lirun_lastyear == 0:
+                        lirun_lastyear = 0.00001
+
+                    if not isinstance(lirun_now, float):
+                        lirun_now = 0.00001
+
+                    data.loc[index, '净利润增长率(%)' + str(i)] = (lirun_now - lirun_lastyear) * 100 / lirun_lastyear
 
             except Exception as e:
                 print(code)

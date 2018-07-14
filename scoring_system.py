@@ -142,6 +142,14 @@ def score_func(data, year):
             else:
                 scroe_sum -= 10
 
+            tiaojian = row['净利润增长率(%)' + str(i)]
+            if tiaojian > 10:
+                scroe_sum += 50
+            elif tiaojian > 0:
+                scroe_sum += 20
+            else:
+                scroe_sum -= 50
+
         tiaojian = row['利润同比(%)']
         if tiaojian > 20:
             scroe_sum += 50
@@ -172,10 +180,11 @@ def filter_stock_by_cwbb(year):
         gplb = gplb[gplb['毛利率(%)' + str(i)] > 20]
 
         gplb = gplb[gplb['费用总和(万元)' + str(i)] / (gplb['营业总收入(万元)' + str(i)] - gplb['营业总成本(万元)' + str(i)]) < 1]
-
-
         gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] > 0]
         gplb = gplb[gplb['净利润(万元)' + str(i)] > 0]
+        gplb = gplb[gplb['净利润增长率(%)'+ str(i)] > 0]
+        gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] / gplb['净利润(万元)' + str(i)] > 0.75]
+        gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] / abs(gplb['投资活动产生的现金流量净额(万元)' + str(i)]) > 0.4]
 
     gplb = gplb[gplb['利润同比(%)'] > 0]
 
