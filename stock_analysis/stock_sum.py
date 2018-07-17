@@ -230,7 +230,7 @@ class stock_sum():
                     except Exception as e:
                         data.loc[index, '毛利率(%)' + str(i)] = -10.0
 
-                data.loc[index, '平均利润(万元)'] = average_profit / 3
+                data.loc[index, '平均利润(万元)'] = average_profit / 4
 
                 for i in range(year - 2, year + 1):
                     lirun_now = float(data['净利润(万元)' + str(i)][index])

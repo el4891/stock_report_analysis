@@ -18,6 +18,54 @@ DEBUG = True
 
 today = str(datetime.now())[:10]
 
+def operation_func(data, year):
+    data['每股平均利润'] = data['平均利润(万元)'] / data['总股本'] / 10000
+
+    data['阈值市盈率'] = (data['净利润增长率(%)' + str(year)] * 1.4 + data['净利润增长率(%)' + str(year - 1)] * 1.2 + data['净利润增长率(%)' + str(year - 2)]) / 6 \
+                    + (data['毛利率(%)' + str(year)] * 1.2 + data['毛利率(%)' + str(year - 1)] * 1.1 + data['毛利率(%)' + str(year - 2)]) / 10
+
+    data['静观其变'] = data['阈值市盈率'] * data['每股平均利润']
+    data['静观其变'] = data['静观其变'].round(1)
+    
+    data['买入八千'] = data['静观其变'] * 0.5
+    data['买入八千'] = data['买入八千'].round(1)
+
+    data['买入六千'] = data['静观其变'] * 0.6
+    data['买入六千'] = data['买入六千'].round(1)
+
+    data['买入五千'] = data['静观其变'] * 0.7
+    data['买入五千'] = data['买入五千'].round(1)
+
+    data['买入四千'] = data['静观其变'] * 0.8
+    data['买入四千'] = data['买入四千'].round(1)
+
+    data['买入三千'] = data['静观其变'] * 0.9
+    data['买入三千'] = data['买入三千'].round(1)
+
+    data['卖出两千'] = data['静观其变'] * 1.1
+    data['卖出两千'] = data['卖出两千'].round(1)
+
+    data['卖出五千'] = data['静观其变'] * 1.2
+    data['卖出五千'] = data['卖出五千'].round(1)
+
+    data['卖出八千'] = data['静观其变'] * 1.3
+    data['卖出八千'] = data['卖出八千'].round(1)
+
+    data['卖出一万'] = data['静观其变'] * 1.4
+    data['卖出一万'] = data['卖出一万'].round(1)
+
+    data['卖出一万五'] = data['静观其变'] * 1.5
+    data['卖出一万五'] = data['卖出一万五'].round(1)
+
+    data['卖出两万'] = data['静观其变'] * 1.6
+    data['卖出两万'] = data['卖出两万'].round(1)
+
+    data = data[['名字', '行业', '地区', '评分', '每股平均利润', '阈值市盈率',
+                 '买入八千', '买入六千', '买入五千', '买入四千', '买入三千', '静观其变',
+                 '卖出两千', '卖出五千', '卖出八千', '卖出一万', '卖出一万五', '卖出两万']]
+
+    data.to_excel(os.path.join(out_folder, '%s操作策略.xlsx' % (today)))
+
 def score_func(data, year):
     data['评分'] = 0
     for index, row in data.iterrows():
@@ -177,12 +225,12 @@ def filter_stock_by_cwbb(year):
         gplb = gplb[gplb['货币资金(万元)' + str(i)] / gplb['有息负债(万元)' + str(i)] > 1]
         gplb = gplb[abs(gplb['营业外收入(万元)' + str(i)]) / abs(gplb['营业总收入(万元)' + str(i)]) < 0.4]
         gplb = gplb[abs(gplb['营业外支出(万元)' + str(i)]) / abs(gplb['营业总成本(万元)' + str(i)]) < 0.4]
-        gplb = gplb[gplb['毛利率(%)' + str(i)] > 20]
+        gplb = gplb[gplb['毛利率(%)' + str(i)] > 15]
 
         gplb = gplb[gplb['费用总和(万元)' + str(i)] / (gplb['营业总收入(万元)' + str(i)] - gplb['营业总成本(万元)' + str(i)]) < 1]
         gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] > 0]
         gplb = gplb[gplb['净利润(万元)' + str(i)] > 0]
-        gplb = gplb[gplb['净利润增长率(%)'+ str(i)] > 0]
+        gplb = gplb[gplb['净利润增长率(%)'+ str(i)] > -10]
         gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] / gplb['净利润(万元)' + str(i)] > 0.75]
         gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] / abs(gplb['投资活动产生的现金流量净额(万元)' + str(i)]) > 0.4]
 
@@ -192,6 +240,9 @@ def filter_stock_by_cwbb(year):
 
     file = os.path.join(out_folder, '%s%s财务报表评分后的公司%s.csv' % (calcu_end_year, month_day, today))
     gplb.to_csv(file, encoding='utf-8')
+
+    operation_func(gplb, year)
+
 
 def filter_stock_by_average_pe(src_path, min, max):
     gplb = pd.read_csv(src_path, index_col=0, encoding='utf-8')
