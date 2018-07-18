@@ -21,8 +21,14 @@ today = str(datetime.now())[:10]
 def operation_func(data, year):
     data['每股平均利润'] = data['平均利润(万元)'] / data['总股本'] / 10000
 
-    data['阈值市盈率'] = (data['净利润增长率(%)' + str(year)] * 1.4 + data['净利润增长率(%)' + str(year - 1)] * 1.2 + data['净利润增长率(%)' + str(year - 2)]) / 6 \
-                    + (data['毛利率(%)' + str(year)] * 1.2 + data['毛利率(%)' + str(year - 1)] * 1.1 + data['毛利率(%)' + str(year - 2)]) / 10
+    data['阈值净利率'] = (data['净利润增长率(%)' + str(year)] * 1.4 + data['净利润增长率(%)' + str(year - 1)] * 1.2 + data['净利润增长率(%)' + str(year - 2)]) / 4
+    data['阈值净利率'] = data['阈值净利率'].round(1)
+
+    data['阈值毛利率'] = (data['毛利率(%)' + str(year)] * 1.2 + data['毛利率(%)' + str(year - 1)] * 1.1 + data['毛利率(%)' + str(year - 2)]) / 20
+    data['阈值毛利率'] = data['阈值毛利率'].round(1)
+
+    data['阈值市盈率'] = 4 + data['阈值净利率'] + data['阈值毛利率']
+    data['阈值市盈率'] = data['阈值市盈率'].round(1)
 
     data['静观其变'] = data['阈值市盈率'] * data['每股平均利润']
     data['静观其变'] = data['静观其变'].round(1)
@@ -60,7 +66,7 @@ def operation_func(data, year):
     data['卖出两万'] = data['静观其变'] * 1.6
     data['卖出两万'] = data['卖出两万'].round(1)
 
-    data = data[['名字', '行业', '地区', '评分', '每股平均利润', '阈值市盈率',
+    data = data[['名字', '行业', '地区', '评分', '每股平均利润', '阈值市盈率', '阈值净利率', '阈值毛利率',
                  '买入八千', '买入六千', '买入五千', '买入四千', '买入三千', '静观其变',
                  '卖出两千', '卖出五千', '卖出八千', '卖出一万', '卖出一万五', '卖出两万']]
 
@@ -256,7 +262,7 @@ def filter_stock_by_average_pe(src_path, min, max):
     current_price = current_price[['trade']]
     current_price.columns = ['价格']
     gplb = gplb[
-        ['名字', '行业', '地区', '流通股本', '总股本', '总资产(万)', '市净率', '利润同比(%)', '毛利率(%)', '净利润率(%)', '平均利润(万元)', '评分']]
+        ['名字', '行业', '地区', '总股本', '总资产(万)', '市净率', '利润同比(%)', '毛利率(%)', '净利润率(%)', '平均利润(万元)', '净利润增长率(%)'+ str(calcu_end_year - 2), '净利润增长率(%)'+ str(calcu_end_year - 1), '净利润增长率(%)'+ str(calcu_end_year), '评分']]
 
     data = pd.merge(gplb, current_price, left_index=True, right_index=True)
     # 因为这里的平均利润单位是万元，而总股本单位是亿，价格单位是元
@@ -269,10 +275,12 @@ def filter_stock_by_average_pe(src_path, min, max):
     data = data[data['平均市盈率'] < (month_day == '-06-30' and max * 2 or max)]
     data = data[data['平均市盈率'] > min]
     data['平均市盈率'] = data['平均市盈率'].round(1)
-    data['平均利润(万元)'] = data['平均利润(万元)'].round()
+    data['平均利润(万元)'] = data['平均利润(万元)'].round(1)
     data['市净率'] = data['市净率'].round(1)
-    data['总股本'] = data['总股本'].round()
-    data['流通股本'] = data['流通股本'].round()
+
+    for i in range(calcu_end_year - 2, calcu_end_year + 1):
+        data['净利润增长率(%)' + str(i)] = data['净利润增长率(%)' + str(i)].round(1)
+
     average_pe_file = \
         os.path.join(out_folder, '%s%s-3年平均市盈率在%s和%s之间的公司评分%s.xlsx' % (calcu_end_year, month_day, min, max, today))
     data.to_excel(average_pe_file)
