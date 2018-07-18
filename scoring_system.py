@@ -67,11 +67,26 @@ def operation_func(data, year):
     data['卖出八份'] = data['静观其变'] * 1.6
     data['卖出八份'] = data['卖出八份'].round(1)
 
-    data = data[['名字', '行业', '地区', '评分', '每股平均利润', '阈值市盈率', '阈值净利率', '阈值毛利率',
+    data = data[['名字', '行业', '地区', '评分', '每股平均利润', '阈值市盈率',
                  '买入六份', '买入四份', '买入三份', '买入两份', '买入一份', '静观其变',
                  '卖出一份', '卖出两份', '卖出三份', '卖出四份', '卖出六份', '卖出八份']]
 
     data.to_excel(os.path.join(out_folder, '%s操作策略.xlsx' % (today)))
+
+    # 获取当前股票价格
+    price_path = os.path.join(out_folder, '股票价格%s.csv' % (today))
+    if not os.path.exists(price_path):
+        ts.get_today_all().set_index('code').to_csv(price_path, encoding="utf-8")
+
+    current_price = pd.read_csv(price_path, encoding="utf-8", index_col=0)
+    current_price = current_price[['trade']]
+    current_price.columns = ['价格']
+
+    data = pd.merge(data, current_price, left_index=True, right_index=True)
+
+    data = data[data['价格'] < data['静观其变']]
+
+    data.to_excel(os.path.join(out_folder, '%s可买入股票.xlsx' % (today)))
 
 def score_func(data, year):
     data['评分'] = 0
