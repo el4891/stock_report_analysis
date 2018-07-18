@@ -20,55 +20,56 @@ today = str(datetime.now())[:10]
 
 def operation_func(data, year):
     data['每股平均利润'] = data['平均利润(万元)'] / data['总股本'] / 10000
+    data['每股平均利润'] = data['每股平均利润'].round(3)
 
     data['阈值净利率'] = (data['净利润增长率(%)' + str(year)] * 1.4 + data['净利润增长率(%)' + str(year - 1)] * 1.2 + data['净利润增长率(%)' + str(year - 2)]) / 4
     data['阈值净利率'] = data['阈值净利率'].round(1)
 
-    data['阈值毛利率'] = (data['毛利率(%)' + str(year)] * 1.2 + data['毛利率(%)' + str(year - 1)] * 1.1 + data['毛利率(%)' + str(year - 2)]) / 20
+    data['阈值毛利率'] = (data['毛利率(%)' + str(year)] * 1.2 + data['毛利率(%)' + str(year - 1)] * 1.1 + data['毛利率(%)' + str(year - 2)]) / 18
     data['阈值毛利率'] = data['阈值毛利率'].round(1)
 
-    data['阈值市盈率'] = 4 + data['阈值净利率'] + data['阈值毛利率']
+    data['阈值市盈率'] = 3 + data['阈值净利率'] + data['阈值毛利率']
     data['阈值市盈率'] = data['阈值市盈率'].round(1)
 
     data['静观其变'] = data['阈值市盈率'] * data['每股平均利润']
     data['静观其变'] = data['静观其变'].round(1)
     
-    data['买入八千'] = data['静观其变'] * 0.5
-    data['买入八千'] = data['买入八千'].round(1)
+    data['买入六份'] = data['静观其变'] * 0.5
+    data['买入六份'] = data['买入六份'].round(1)
 
-    data['买入六千'] = data['静观其变'] * 0.6
-    data['买入六千'] = data['买入六千'].round(1)
+    data['买入四份'] = data['静观其变'] * 0.6
+    data['买入四份'] = data['买入四份'].round(1)
 
-    data['买入五千'] = data['静观其变'] * 0.7
-    data['买入五千'] = data['买入五千'].round(1)
+    data['买入三份'] = data['静观其变'] * 0.7
+    data['买入三份'] = data['买入三份'].round(1)
 
-    data['买入四千'] = data['静观其变'] * 0.8
-    data['买入四千'] = data['买入四千'].round(1)
+    data['买入两份'] = data['静观其变'] * 0.8
+    data['买入两份'] = data['买入两份'].round(1)
 
-    data['买入三千'] = data['静观其变'] * 0.9
-    data['买入三千'] = data['买入三千'].round(1)
+    data['买入一份'] = data['静观其变'] * 0.9
+    data['买入一份'] = data['买入一份'].round(1)
 
-    data['卖出两千'] = data['静观其变'] * 1.1
-    data['卖出两千'] = data['卖出两千'].round(1)
+    data['卖出一份'] = data['静观其变'] * 1.1
+    data['卖出一份'] = data['卖出一份'].round(1)
 
-    data['卖出五千'] = data['静观其变'] * 1.2
-    data['卖出五千'] = data['卖出五千'].round(1)
+    data['卖出两份'] = data['静观其变'] * 1.2
+    data['卖出两份'] = data['卖出两份'].round(1)
 
-    data['卖出八千'] = data['静观其变'] * 1.3
-    data['卖出八千'] = data['卖出八千'].round(1)
+    data['卖出三份'] = data['静观其变'] * 1.3
+    data['卖出三份'] = data['卖出三份'].round(1)
 
-    data['卖出一万'] = data['静观其变'] * 1.4
-    data['卖出一万'] = data['卖出一万'].round(1)
+    data['卖出四份'] = data['静观其变'] * 1.4
+    data['卖出四份'] = data['卖出四份'].round(1)
 
-    data['卖出一万五'] = data['静观其变'] * 1.5
-    data['卖出一万五'] = data['卖出一万五'].round(1)
+    data['卖出六份'] = data['静观其变'] * 1.5
+    data['卖出六份'] = data['卖出六份'].round(1)
 
-    data['卖出两万'] = data['静观其变'] * 1.6
-    data['卖出两万'] = data['卖出两万'].round(1)
+    data['卖出八份'] = data['静观其变'] * 1.6
+    data['卖出八份'] = data['卖出八份'].round(1)
 
     data = data[['名字', '行业', '地区', '评分', '每股平均利润', '阈值市盈率', '阈值净利率', '阈值毛利率',
-                 '买入八千', '买入六千', '买入五千', '买入四千', '买入三千', '静观其变',
-                 '卖出两千', '卖出五千', '卖出八千', '卖出一万', '卖出一万五', '卖出两万']]
+                 '买入六份', '买入四份', '买入三份', '买入两份', '买入一份', '静观其变',
+                 '卖出一份', '卖出两份', '卖出三份', '卖出四份', '卖出六份', '卖出八份']]
 
     data.to_excel(os.path.join(out_folder, '%s操作策略.xlsx' % (today)))
 
