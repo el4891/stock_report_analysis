@@ -67,22 +67,13 @@ def operation_func(data, year):
     data['卖出八份'] = data['静观其变'] * 1.6
     data['卖出八份'] = data['卖出八份'].round(1)
 
-    data = data[['名字', '行业', '地区', '评分', '每股平均利润', '阈值市盈率',
+    data = data[['名字', '行业', '地区', '评分', '每股平均利润', '阈值市盈率', '价格',
                  '买入六份', '买入四份', '买入三份', '买入两份', '买入一份', '静观其变',
                  '卖出一份', '卖出两份', '卖出三份', '卖出四份', '卖出六份', '卖出八份']]
 
+    data = data[data['评分'] > 1000]
+
     data.to_excel(os.path.join(out_folder, '%s操作策略.xlsx' % (today)))
-
-    # 获取当前股票价格
-    price_path = os.path.join(out_folder, '股票价格%s.csv' % (today))
-    if not os.path.exists(price_path):
-        ts.get_today_all().set_index('code').to_csv(price_path, encoding="utf-8")
-
-    current_price = pd.read_csv(price_path, encoding="utf-8", index_col=0)
-    current_price = current_price[['trade']]
-    current_price.columns = ['价格']
-
-    data = pd.merge(data, current_price, left_index=True, right_index=True)
 
     data = data[data['价格'] < data['静观其变']]
 
@@ -252,22 +243,13 @@ def filter_stock_by_cwbb(year):
         gplb = gplb[gplb['费用总和(万元)' + str(i)] / (gplb['营业总收入(万元)' + str(i)] - gplb['营业总成本(万元)' + str(i)]) < 1]
         gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] > 0]
         gplb = gplb[gplb['净利润(万元)' + str(i)] > 0]
-        gplb = gplb[gplb['净利润增长率(%)'+ str(i)] > -10]
+        gplb = gplb[gplb['净利润增长率(%)'+ str(i)] > 0]
         gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] / gplb['净利润(万元)' + str(i)] > 0.75]
         gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] / abs(gplb['投资活动产生的现金流量净额(万元)' + str(i)]) > 0.4]
 
     gplb = gplb[gplb['利润同比(%)'] > 0]
 
     gplb = score_func(gplb, year)
-
-    file = os.path.join(out_folder, '%s%s财务报表评分后的公司%s.csv' % (calcu_end_year, month_day, today))
-    gplb.to_csv(file, encoding='utf-8')
-
-    operation_func(gplb, year)
-
-
-def filter_stock_by_average_pe(src_path, min, max):
-    gplb = pd.read_csv(src_path, index_col=0, encoding='utf-8')
 
     # 获取当前股票价格
     price_path = os.path.join(out_folder, '股票价格%s.csv' % (today))
@@ -277,12 +259,24 @@ def filter_stock_by_average_pe(src_path, min, max):
     current_price = pd.read_csv(price_path, encoding="utf-8", index_col=0)
     current_price = current_price[['trade']]
     current_price.columns = ['价格']
-    gplb = gplb[
-        ['名字', '行业', '地区', '总股本', '总资产(万)', '市净率', '利润同比(%)', '毛利率(%)', '净利润率(%)', '平均利润(万元)', '净利润增长率(%)'+ str(calcu_end_year - 2), '净利润增长率(%)'+ str(calcu_end_year - 1), '净利润增长率(%)'+ str(calcu_end_year), '评分']]
 
-    data = pd.merge(gplb, current_price, left_index=True, right_index=True)
+    gplb = pd.merge(gplb, current_price, left_index=True, right_index=True)
+
     # 因为这里的平均利润单位是万元，而总股本单位是亿，价格单位是元
-    data['平均市盈率'] = data['总股本'] * data['价格'] * 10000 / data['平均利润(万元)']
+    gplb['平均市盈率'] = gplb['总股本'] * gplb['价格'] * 10000 / gplb['平均利润(万元)']
+
+    file = os.path.join(out_folder, '%s%s财务报表评分后的公司%s.csv' % (calcu_end_year, month_day, today))
+    gplb.to_csv(file, encoding='utf-8')
+
+    operation_func(gplb, year)
+
+
+def filter_stock_by_average_pe(src_path, min, max):
+    data = pd.read_csv(src_path, index_col=0, encoding='utf-8')
+
+    data = data[
+        ['名字', '价格', '行业', '地区', '总股本', '总资产(万)', '市净率', '平均市盈率', '利润同比(%)', '毛利率(%)', '净利润率(%)', '平均利润(万元)', '净利润增长率(%)'+ str(calcu_end_year - 2), '净利润增长率(%)'+ str(calcu_end_year - 1), '净利润增长率(%)'+ str(calcu_end_year), '评分']]
+
     print('\n%s:' % today)
     print()
     print('%d个公司' % data.shape[0])
