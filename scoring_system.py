@@ -71,7 +71,7 @@ def operation_func(data, year):
                  '买入六份', '买入四份', '买入三份', '买入两份', '买入一份', '静观其变',
                  '卖出一份', '卖出两份', '卖出三份', '卖出四份', '卖出六份', '卖出八份']]
 
-    data = data[data['评分'] > 1000]
+    data = data[data['评分'] > 1100]
 
     data.to_excel(os.path.join(out_folder, '%s操作策略.xlsx' % (today)))
 
@@ -240,15 +240,14 @@ def filter_stock_by_cwbb(year):
         gplb = gplb[abs(gplb['营业外支出(万元)' + str(i)]) / abs(gplb['营业总成本(万元)' + str(i)]) < 0.4]
         gplb = gplb[gplb['毛利率(%)' + str(i)] > 15]
 
-        gplb = gplb[gplb['费用总和(万元)' + str(i)] / (gplb['营业总收入(万元)' + str(i)] - gplb['营业总成本(万元)' + str(i)]) < 1]
+        gplb = gplb[gplb['费用总和(万元)' + str(i)] / (gplb['营业总收入(万元)' + str(i)] - gplb['营业总成本(万元)' + str(i)]) < 1.1]
         gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] > 0]
         gplb = gplb[gplb['净利润(万元)' + str(i)] > 0]
-        gplb = gplb[gplb['净利润增长率(%)'+ str(i)] > 0]
+        gplb = gplb[gplb['净利润增长率(%)'+ str(i)] > -10]
         gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] / gplb['净利润(万元)' + str(i)] > 0.75]
         gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] / abs(gplb['投资活动产生的现金流量净额(万元)' + str(i)]) > 0.4]
 
     gplb = gplb[gplb['利润同比(%)'] > 0]
-
     gplb = score_func(gplb, year)
 
     # 获取当前股票价格
