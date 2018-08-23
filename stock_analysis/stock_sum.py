@@ -176,6 +176,18 @@ class stock_sum():
                         float('--' == zcfzb_data['资产总计(万元)'][str(i) + self.__m_d] and 0.00001 \
                               or zcfzb_data['资产总计(万元)'][str(i) + self.__m_d])
 
+                    data.loc[index, '负债合计(万元)' + str(i)] = \
+                        float('--' == zcfzb_data['负债合计(万元)'][str(i) + self.__m_d] and 0.00001 \
+                              or zcfzb_data['负债合计(万元)'][str(i) + self.__m_d])
+
+                    data.loc[index, '负债合计(万元)' + str(i)] = \
+                        float('--' == zcfzb_data['负债合计(万元)'][str(i) + self.__m_d] and 0.00001 \
+                              or zcfzb_data['负债合计(万元)'][str(i) + self.__m_d])
+
+                    data.loc[index, '存货(万元)' + str(i)] = \
+                        float('--' == zcfzb_data['存货(万元)'][str(i) + self.__m_d] and 0.00001 \
+                              or zcfzb_data['存货(万元)'][str(i) + self.__m_d])
+
                 lrb_data = pd.read_csv(os.path.join(os.path.join(self.__floder, 'lrb'), code + '.csv'), encoding='gbk', index_col=0)
                 lrb_data = lrb_data.T
 
