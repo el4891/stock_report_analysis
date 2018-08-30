@@ -62,13 +62,13 @@ def operation_func(data, year):
     data['每股平均利润'] = data['平均利润(万元)'] / data['总股本'] / 10000
     data['每股平均利润'] = data['每股平均利润'].round(3)
 
-    data['阈值净利率'] = (data['净利润增长率(%)' + str(year)] * 1.4 + data['净利润增长率(%)' + str(year - 1)] * 1.2 + data['净利润增长率(%)' + str(year - 2)]) / 4
+    data['阈值净利率'] = (data['净利润增长率(%)' + str(year)] * 1.4 + data['净利润增长率(%)' + str(year - 1)] * 1.2 + data['净利润增长率(%)' + str(year - 2)]) / 13
     data['阈值净利率'] = data['阈值净利率'].round(1)
 
-    data['阈值毛利率'] = (data['毛利率(%)' + str(year)] * 1.2 + data['毛利率(%)' + str(year - 1)] * 1.1 + data['毛利率(%)' + str(year - 2)]) / 18
+    data['阈值毛利率'] = (data['毛利率(%)' + str(year)] * 1.2 + data['毛利率(%)' + str(year - 1)] * 1.1 + data['毛利率(%)' + str(year - 2)]) / 16
     data['阈值毛利率'] = data['阈值毛利率'].round(1)
 
-    data['阈值市盈率'] = 3 + data['阈值净利率'] + data['阈值毛利率']
+    data['阈值市盈率'] = 7 + data['阈值净利率'] + data['阈值毛利率']
     data['阈值市盈率'] = data['阈值市盈率'].round(1)
 
     data['静观其变'] = data['阈值市盈率'] * data['每股平均利润']
@@ -107,15 +107,15 @@ def operation_func(data, year):
     data['卖出八份'] = data['静观其变'] * 1.6
     data['卖出八份'] = data['卖出八份'].round(1)
 
-    data = data[['名字', '行业', '地区', '评分', '每股平均利润', '阈值市盈率', '价格',
+    data = data[['名字', '行业', '地区', '评分', '每股平均利润', '阈值市盈率', '阈值净利率', '阈值毛利率', '价格',
                  '买入六份', '买入四份', '买入三份', '买入两份', '买入一份', '静观其变',
                  '卖出一份', '卖出两份', '卖出三份', '卖出四份', '卖出六份', '卖出八份']]
 
-    data = data[data['评分'] > 1100]
+    data = data[data['评分'] > 800]
 
     data.to_excel(os.path.join(out_folder, '%s操作策略.xlsx' % (today)))
 
-    data = data[data['价格'] < data['静观其变']]
+    data = data[data['价格'] < data['静观其变'] * 1.2]
 
     data.to_excel(os.path.join(out_folder, '%s可买入股票.xlsx' % (today)))
 
@@ -283,25 +283,25 @@ def filter_stock_by_cwbb(year):
     pianyi_func(gplb, year)
 
     for i in range(year - 2, year + 1):
-        gplb = gplb[gplb['利润总额(万元)' + str(i)] / gplb['生产资产(万元)' + str(i)] > 0.1]
-        gplb = gplb[gplb['非主业资产(万元)' + str(i)] / gplb['资产总计(万元)' + str(i)] < 0.2]
+        #gplb = gplb[gplb['利润总额(万元)' + str(i)] / gplb['生产资产(万元)' + str(i)] > 0.1]
+        #gplb = gplb[gplb['非主业资产(万元)' + str(i)] / gplb['资产总计(万元)' + str(i)] < 0.2]
         gplb = gplb[gplb['应收款(万元)' + str(i)] / gplb['资产总计(万元)' + str(i)] < 0.3]
-        gplb = gplb[gplb['有息负债(万元)' + str(i)] / gplb['资产总计(万元)' + str(i)] < 0.6]
-        gplb = gplb[gplb['其他应收款(万元)' + str(i)] / gplb['平均利润(万元)'] < 0.3]
-        gplb = gplb[gplb['其他应付款(万元)' + str(i)] / gplb['平均利润(万元)'] < 0.4]
-        gplb = gplb[abs(gplb['资产减值损失(万元)' + str(i)]) / gplb['平均利润(万元)'] < 0.3]
+        #gplb = gplb[gplb['有息负债(万元)' + str(i)] / gplb['资产总计(万元)' + str(i)] < 0.6]
+        #gplb = gplb[gplb['其他应收款(万元)' + str(i)] / gplb['平均利润(万元)'] < 0.3]
+        #gplb = gplb[gplb['其他应付款(万元)' + str(i)] / gplb['平均利润(万元)'] < 0.4]
+        #gplb = gplb[abs(gplb['资产减值损失(万元)' + str(i)]) / gplb['平均利润(万元)'] < 0.3]
 
         gplb = gplb[gplb['货币资金(万元)' + str(i)] / gplb['有息负债(万元)' + str(i)] > 1]
-        gplb = gplb[abs(gplb['营业外收入(万元)' + str(i)]) / abs(gplb['营业总收入(万元)' + str(i)]) < 0.4]
-        gplb = gplb[abs(gplb['营业外支出(万元)' + str(i)]) / abs(gplb['营业总成本(万元)' + str(i)]) < 0.4]
+        #gplb = gplb[abs(gplb['营业外收入(万元)' + str(i)]) / abs(gplb['营业总收入(万元)' + str(i)]) < 0.4]
+        #gplb = gplb[abs(gplb['营业外支出(万元)' + str(i)]) / abs(gplb['营业总成本(万元)' + str(i)]) < 0.4]
         gplb = gplb[gplb['毛利率(%)' + str(i)] > 15]
 
-        gplb = gplb[gplb['费用总和(万元)' + str(i)] / (gplb['营业总收入(万元)' + str(i)] - gplb['营业总成本(万元)' + str(i)]) < 1.1]
+        #gplb = gplb[gplb['费用总和(万元)' + str(i)] / (gplb['营业总收入(万元)' + str(i)] - gplb['营业总成本(万元)' + str(i)]) < 1.1]
         gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] > 0]
         gplb = gplb[gplb['净利润(万元)' + str(i)] > 0]
-        gplb = gplb[gplb['净利润增长率(%)'+ str(i)] > -10]
-        gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] / gplb['净利润(万元)' + str(i)] > 0.75]
-        gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] / abs(gplb['投资活动产生的现金流量净额(万元)' + str(i)]) > 0.4]
+        gplb = gplb[gplb['净利润增长率(%)'+ str(i)] > 0]
+        gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] / gplb['净利润(万元)' + str(i)] > 0.8]
+        #gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] / abs(gplb['投资活动产生的现金流量净额(万元)' + str(i)]) > 0.4]
 
     gplb = gplb[gplb['利润同比(%)'] > 0]
     gplb = score_func(gplb, year)
