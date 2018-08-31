@@ -48,6 +48,8 @@ class stock_sum():
 
         data = self.__add_cwbb_data(data, self.__year)
 
+        data['每股平均利润'] = data['平均利润(万元)'] / data['总股本'] / 10000
+
         data.to_csv(
             os.path.join(self.__out, '%s%s财务指标分析汇总.csv' % (self.__year, self.__m_d)), encoding='utf-8')
 

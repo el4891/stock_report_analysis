@@ -40,7 +40,6 @@ def pianyi_func(data, year):
 
     data['平均市净率'] = data['价格'] / ((data['真流动资产合计'] - data['负债合计(万元)' + str(year)]) / data['总股本'] / 10000)
 
-    data['每股平均利润'] = data['平均利润(万元)'] / data['总股本'] / 10000
     data['每股平均利润'] = data['每股平均利润'].round(3)
 
     data['阈值净利率'] = (data['净利润增长率(%)' + str(year)] * 1.4 + data['净利润增长率(%)' + str(year - 1)] * 1.2 + data[
@@ -59,7 +58,6 @@ def pianyi_func(data, year):
     data.to_excel(os.path.join(out_folder, '%s便宜股票.xlsx' % (today)))
 
 def operation_func(data, year):
-    data['每股平均利润'] = data['平均利润(万元)'] / data['总股本'] / 10000
     data['每股平均利润'] = data['每股平均利润'].round(3)
 
     data['阈值净利率'] = (data['净利润增长率(%)' + str(year)] * 1.4 + data['净利润增长率(%)' + str(year - 1)] * 1.2 + data['净利润增长率(%)' + str(year - 2)]) / 13
@@ -300,7 +298,7 @@ def filter_stock_by_cwbb(year):
         gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] > 0]
         gplb = gplb[gplb['净利润(万元)' + str(i)] > 0]
         gplb = gplb[gplb['净利润增长率(%)'+ str(i)] > 0]
-        gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] / gplb['净利润(万元)' + str(i)] > 0.8]
+        gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] / gplb['净利润(万元)' + str(i)] > 0.75]
         #gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] / abs(gplb['投资活动产生的现金流量净额(万元)' + str(i)]) > 0.4]
 
     gplb = gplb[gplb['利润同比(%)'] > 0]
