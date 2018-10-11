@@ -22,36 +22,33 @@ today = str(datetime.now())[:10]
 def pianyi_func(data, year):
 
     for i in range(year - 2, year + 1):
-        data = data[data['非主业资产(万元)' + str(i)] / data['资产总计(万元)' + str(i)] < 0.2]
-        data = data[data['应收款(万元)' + str(i)] / data['资产总计(万元)' + str(i)] < 0.3]
-        data = data[data['其他应收款(万元)' + str(i)] / data['平均利润(万元)'] < 0.3]
+        data = data[data['经营活动产生的现金流量净额(万元)' + str(i)] > 10000]
+        data = data[data['净利润(万元)' + str(i)] > 10000]
 
-        data = data[data['货币资金(万元)' + str(i)] / data['有息负债(万元)' + str(i)] > 1]
-        data = data[data['毛利率(%)' + str(i)] > 10]
+    data = data[data['应收款(万元)' + str(year)] / data['资产总计(万元)' + str(year)] < 0.4]
+    data = data[data['货币资金(万元)' + str(year)] + (data['流动资产合计(万元)' + str(year)] - data['货币资金(万元)' + str(year)]) / 5 > data['负债合计(万元)' + str(year)]]
 
-        data = data[data['经营活动产生的现金流量净额(万元)' + str(i)] > 0]
-        data = data[data['净利润(万元)' + str(i)] > 0]
-        data = data[data['净利润增长率(%)'+ str(i)] > -10]
-        data = data[data['经营活动产生的现金流量净额(万元)' + str(i)] / data['净利润(万元)' + str(i)] > 0.8]
+    data = data[data['净利润增长率(%)'+ str(year)] + data['净利润增长率(%)'+ str(year - 1)] + data['净利润增长率(%)'+ str(year - 2)] > 30]
+    data = data[(data['经营活动产生的现金流量净额(万元)' + str(year)] + data['经营活动产生的现金流量净额(万元)' + str(year - 1)] + data['经营活动产生的现金流量净额(万元)' + str(year - 2)] + data['经营活动产生的现金流量净额(万元)' + str(year - 3)]) / (data['净利润(万元)' + str(year)] + data['净利润(万元)' + str(year - 1)] + data['净利润(万元)' + str(year - 2)] + data['净利润(万元)' + str(year - 3)]) > 1.2]
+    data = data[data['毛利率(%)' + str(year)] + data['毛利率(%)' + str(year - 1)] + data['毛利率(%)' + str(year - 2)] + data['毛利率(%)' + str(year - 3)] > 40]
 
-    data['真流动资产合计'] = data['货币资金(万元)' + str(year)] + data['应收款(万元)' + str(year)] / 2 + data['存货(万元)' + str(year)] / 2
-
-    data = data[data['真流动资产合计'] / data['负债合计(万元)' + str(year)] > 2]
-
-    data['平均市净率'] = data['价格'] / ((data['真流动资产合计'] - data['负债合计(万元)' + str(year)]) / data['总股本'] / 10000)
+    data['平均市净率'] = data['价格'] / ((data['流动资产合计(万元)' + str(year)]  - data['负债合计(万元)' + str(year)]) / data['总股本'] / 10000)
 
     data['每股平均利润'] = data['每股平均利润'].round(3)
 
     data['阈值净利率'] = (data['净利润增长率(%)' + str(year)] * 1.4 + data['净利润增长率(%)' + str(year - 1)] * 1.2 + data[
-        '净利润增长率(%)' + str(year - 2)]) / 4
+        '净利润增长率(%)' + str(year - 2)]) / 13
     data['阈值净利率'] = data['阈值净利率'].round(1)
 
     data['阈值毛利率'] = (data['毛利率(%)' + str(year)] * 1.2 + data['毛利率(%)' + str(year - 1)] * 1.1 + data[
-        '毛利率(%)' + str(year - 2)]) / 18
+        '毛利率(%)' + str(year - 2)]) / 16
     data['阈值毛利率'] = data['阈值毛利率'].round(1)
 
-    data['阈值市盈率'] = 3 + data['阈值净利率'] + data['阈值毛利率']
+    data['阈值市盈率'] = 5 + data['阈值净利率'] + data['阈值毛利率']
     data['阈值市盈率'] = data['阈值市盈率'].round(1)
+
+    data = data[data['平均市盈率'] < 21]
+    data = data[data['平均市净率'] < 3]
 
     data = data[['名字', '行业', '地区', '每股平均利润', '阈值市盈率', '价格', '平均市盈率', '平均市净率']]
 
@@ -66,7 +63,7 @@ def operation_func(data, year):
     data['阈值毛利率'] = (data['毛利率(%)' + str(year)] * 1.2 + data['毛利率(%)' + str(year - 1)] * 1.1 + data['毛利率(%)' + str(year - 2)]) / 16
     data['阈值毛利率'] = data['阈值毛利率'].round(1)
 
-    data['阈值市盈率'] = 7 + data['阈值净利率'] + data['阈值毛利率']
+    data['阈值市盈率'] = 5 + data['阈值净利率'] + data['阈值毛利率']
     data['阈值市盈率'] = data['阈值市盈率'].round(1)
 
     data['静观其变'] = data['阈值市盈率'] * data['每股平均利润']
@@ -105,11 +102,15 @@ def operation_func(data, year):
     data['卖出八份'] = data['静观其变'] * 1.6
     data['卖出八份'] = data['卖出八份'].round(1)
 
-    data = data[['名字', '行业', '地区', '评分', '每股平均利润', '阈值市盈率', '阈值净利率', '阈值毛利率', '价格',
+    data['二十倍市盈率'] = data['每股平均利润'] * 20
+    data['二十倍市盈率'] = data['二十倍市盈率'].round(1)
+
+    data = data[['名字', '行业', '地区', '评分', '每股平均利润', '阈值市盈率', '阈值净利率', '阈值毛利率', '价格', '二十倍市盈率',
                  '买入六份', '买入四份', '买入三份', '买入两份', '买入一份', '静观其变',
                  '卖出一份', '卖出两份', '卖出三份', '卖出四份', '卖出六份', '卖出八份']]
 
-    data = data[data['评分'] > 500]
+    data = data[data['评分'] > 400]
+    data = data[data['价格'] < data['二十倍市盈率']]
 
     data.to_excel(os.path.join(out_folder, '%s操作策略.xlsx' % (today)))
 
@@ -277,31 +278,34 @@ def filter_stock_by_cwbb(year):
 
     # 因为这里的平均利润单位是万元，而总股本单位是亿，价格单位是元
     gplb['平均市盈率'] = gplb['总股本'] * gplb['价格'] * 10000 / gplb['平均利润(万元)']
-
+    gplb = gplb[gplb['平均市盈率'] > 0]
     pianyi_func(gplb, year)
 
     for i in range(year - 2, year + 1):
         #gplb = gplb[gplb['利润总额(万元)' + str(i)] / gplb['生产资产(万元)' + str(i)] > 0.1]
         #gplb = gplb[gplb['非主业资产(万元)' + str(i)] / gplb['资产总计(万元)' + str(i)] < 0.2]
-        gplb = gplb[gplb['应收款(万元)' + str(i)] / gplb['资产总计(万元)' + str(i)] < 0.3]
+        #gplb = gplb[gplb['应收款(万元)' + str(i)] / gplb['资产总计(万元)' + str(i)] < 0.3]
         #gplb = gplb[gplb['有息负债(万元)' + str(i)] / gplb['资产总计(万元)' + str(i)] < 0.6]
         #gplb = gplb[gplb['其他应收款(万元)' + str(i)] / gplb['平均利润(万元)'] < 0.3]
         #gplb = gplb[gplb['其他应付款(万元)' + str(i)] / gplb['平均利润(万元)'] < 0.4]
         #gplb = gplb[abs(gplb['资产减值损失(万元)' + str(i)]) / gplb['平均利润(万元)'] < 0.3]
 
-        gplb = gplb[gplb['货币资金(万元)' + str(i)] / gplb['有息负债(万元)' + str(i)] > 1]
+        #gplb = gplb[gplb['货币资金(万元)' + str(i)] / gplb['有息负债(万元)' + str(i)] > 1]
         #gplb = gplb[abs(gplb['营业外收入(万元)' + str(i)]) / abs(gplb['营业总收入(万元)' + str(i)]) < 0.4]
         #gplb = gplb[abs(gplb['营业外支出(万元)' + str(i)]) / abs(gplb['营业总成本(万元)' + str(i)]) < 0.4]
 
         #gplb = gplb[gplb['费用总和(万元)' + str(i)] / (gplb['营业总收入(万元)' + str(i)] - gplb['营业总成本(万元)' + str(i)]) < 1.1]
-        gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] > 0]
-        gplb = gplb[gplb['净利润(万元)' + str(i)] > 0]
+        gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] > 10000]
+        gplb = gplb[gplb['净利润(万元)' + str(i)] > 10000]
         #gplb = gplb[gplb['净利润增长率(%)'+ str(i)] > 0]
         #gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] / abs(gplb['投资活动产生的现金流量净额(万元)' + str(i)]) > 0.4]
 
+    gplb = gplb[gplb['应收款(万元)' + str(year)] / gplb['资产总计(万元)' + str(year)] < 0.2]
+    gplb = gplb[gplb['货币资金(万元)' + str(year)] + (gplb['流动资产合计(万元)' + str(year)] - gplb['货币资金(万元)' + str(year)]) / 1.4 > gplb['负债合计(万元)' + str(year)]]
+
     gplb = gplb[gplb['净利润增长率(%)'+ str(year)] + gplb['净利润增长率(%)'+ str(year - 1)] + gplb['净利润增长率(%)'+ str(year - 2)] > 20]
-    gplb = gplb[(gplb['经营活动产生的现金流量净额(万元)' + str(year)] + gplb['经营活动产生的现金流量净额(万元)' + str(year - 1)] + gplb['经营活动产生的现金流量净额(万元)' + str(year - 2)] + gplb['经营活动产生的现金流量净额(万元)' + str(year - 3)]) / (gplb['净利润(万元)' + str(year)] + gplb['净利润(万元)' + str(year - 1)] + gplb['净利润(万元)' + str(year - 2)] + gplb['净利润(万元)' + str(year - 3)]) > 1.2]
-    gplb = gplb[gplb['毛利率(%)' + str(year)] + gplb['毛利率(%)' + str(year - 1)] + gplb['毛利率(%)' + str(year - 2)] + gplb['毛利率(%)' + str(year - 3)] > 60]
+    gplb = gplb[(gplb['经营活动产生的现金流量净额(万元)' + str(year)] + gplb['经营活动产生的现金流量净额(万元)' + str(year - 1)] + gplb['经营活动产生的现金流量净额(万元)' + str(year - 2)] + gplb['经营活动产生的现金流量净额(万元)' + str(year - 3)]) / (gplb['净利润(万元)' + str(year)] + gplb['净利润(万元)' + str(year - 1)] + gplb['净利润(万元)' + str(year - 2)] + gplb['净利润(万元)' + str(year - 3)]) > 1.1]
+    gplb = gplb[gplb['毛利率(%)' + str(year)] + gplb['毛利率(%)' + str(year - 1)] + gplb['毛利率(%)' + str(year - 2)] + gplb['毛利率(%)' + str(year - 3)] > 40]
     gplb = score_func(gplb, year)
 
     file = os.path.join(out_folder, '%s%s财务报表评分后的公司%s.csv' % (calcu_end_year, month_day, today))

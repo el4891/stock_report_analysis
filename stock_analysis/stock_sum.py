@@ -178,9 +178,9 @@ class stock_sum():
                         float('--' == zcfzb_data['资产总计(万元)'][str(i) + self.__m_d] and 0.00001 \
                               or zcfzb_data['资产总计(万元)'][str(i) + self.__m_d])
 
-                    data.loc[index, '负债合计(万元)' + str(i)] = \
-                        float('--' == zcfzb_data['负债合计(万元)'][str(i) + self.__m_d] and 0.00001 \
-                              or zcfzb_data['负债合计(万元)'][str(i) + self.__m_d])
+                    data.loc[index, '流动资产合计(万元)' + str(i)] = \
+                        float('--' == zcfzb_data['流动资产合计(万元)'][str(i) + self.__m_d] and 0.00001 \
+                              or zcfzb_data['流动资产合计(万元)'][str(i) + self.__m_d])
 
                     data.loc[index, '负债合计(万元)' + str(i)] = \
                         float('--' == zcfzb_data['负债合计(万元)'][str(i) + self.__m_d] and 0.00001 \
