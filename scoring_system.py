@@ -278,8 +278,13 @@ def filter_stock_by_cwbb(year):
 
     # 因为这里的平均利润单位是万元，而总股本单位是亿，价格单位是元
     gplb['平均市盈率'] = gplb['总股本'] * gplb['价格'] * 10000 / gplb['平均利润(万元)']
+    gplb['平均股息率'] = gplb['总股本'] * gplb['价格'] * 10000 / gplb['平均股息(万元)']
     gplb = gplb[gplb['平均市盈率'] > 0]
-    pianyi_func(gplb, year)
+    gplb = gplb[gplb['平均股息率'] > 0]
+
+    gplb['平均利润率'] = gplb['平均利润(万元)'] / (gplb['营业总成本(万元)' + str(year)] + gplb['营业总成本(万元)' + str(year - 1)] + gplb['营业总成本(万元)' + str(year - 2)] +gplb['营业总成本(万元)' + str(year - 3)]) * 4 * 100
+
+    #pianyi_func(gplb, year)
 
     for i in range(year - 2, year + 1):
         #gplb = gplb[gplb['利润总额(万元)' + str(i)] / gplb['生产资产(万元)' + str(i)] > 0.1]
@@ -301,11 +306,13 @@ def filter_stock_by_cwbb(year):
         #gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] / abs(gplb['投资活动产生的现金流量净额(万元)' + str(i)]) > 0.4]
 
     gplb = gplb[gplb['应收款(万元)' + str(year)] / gplb['资产总计(万元)' + str(year)] < 0.2]
-    gplb = gplb[gplb['货币资金(万元)' + str(year)] + (gplb['流动资产合计(万元)' + str(year)] - gplb['货币资金(万元)' + str(year)]) / 1.4 > gplb['负债合计(万元)' + str(year)]]
+    gplb = gplb[gplb['货币资金(万元)' + str(year)] + (gplb['流动资产合计(万元)' + str(year)] - gplb['货币资金(万元)' + str(year)]) / 1.5 > gplb['负债合计(万元)' + str(year)] * 0.9]
 
     gplb = gplb[gplb['净利润增长率(%)'+ str(year)] + gplb['净利润增长率(%)'+ str(year - 1)] + gplb['净利润增长率(%)'+ str(year - 2)] > 20]
-    gplb = gplb[(gplb['经营活动产生的现金流量净额(万元)' + str(year)] + gplb['经营活动产生的现金流量净额(万元)' + str(year - 1)] + gplb['经营活动产生的现金流量净额(万元)' + str(year - 2)] + gplb['经营活动产生的现金流量净额(万元)' + str(year - 3)]) / (gplb['净利润(万元)' + str(year)] + gplb['净利润(万元)' + str(year - 1)] + gplb['净利润(万元)' + str(year - 2)] + gplb['净利润(万元)' + str(year - 3)]) > 1.1]
-    gplb = gplb[gplb['毛利率(%)' + str(year)] + gplb['毛利率(%)' + str(year - 1)] + gplb['毛利率(%)' + str(year - 2)] + gplb['毛利率(%)' + str(year - 3)] > 40]
+    gplb = gplb[(gplb['经营活动产生的现金流量净额(万元)' + str(year)] + gplb['经营活动产生的现金流量净额(万元)' + str(year - 1)] + gplb['经营活动产生的现金流量净额(万元)' + str(year - 2)] + gplb['经营活动产生的现金流量净额(万元)' + str(year - 3)]) / (gplb['净利润(万元)' + str(year)] + gplb['净利润(万元)' + str(year - 1)] + gplb['净利润(万元)' + str(year - 2)] + gplb['净利润(万元)' + str(year - 3)]) > 1]
+    gplb = gplb[gplb['毛利率(%)' + str(year)] + gplb['毛利率(%)' + str(year - 1)] + gplb['毛利率(%)' + str(year - 2)] + gplb['毛利率(%)' + str(year - 3)] > 50]
+    gplb = gplb[gplb['平均利润率'] > 22]
+
     gplb = score_func(gplb, year)
 
     file = os.path.join(out_folder, '%s%s财务报表评分后的公司%s.csv' % (calcu_end_year, month_day, today))
@@ -318,7 +325,7 @@ def filter_stock_by_average_pe(src_path, min, max):
     data = pd.read_csv(src_path, index_col=0, encoding='utf-8')
 
     data = data[
-        ['名字', '价格', '行业', '地区', '总股本', '总资产(万)', '市净率', '平均市盈率', '利润同比(%)', '毛利率(%)', '净利润率(%)', '平均利润(万元)', '净利润增长率(%)'+ str(calcu_end_year - 2), '净利润增长率(%)'+ str(calcu_end_year - 1), '净利润增长率(%)'+ str(calcu_end_year), '评分']]
+        ['名字', '价格', '行业', '地区', '总股本', '总资产(万)', '市净率', '每股平均利润', '平均市盈率', '平均股息率', '平均利润率', '利润同比(%)', '毛利率(%)', '净利润率(%)', '平均利润(万元)', '净利润增长率(%)'+ str(calcu_end_year - 2), '净利润增长率(%)'+ str(calcu_end_year - 1), '净利润增长率(%)'+ str(calcu_end_year), '评分']]
 
     print('\n%s:' % today)
     print()

@@ -40,9 +40,9 @@ class stock_sum():
 
         data = pd.read_csv(stock_list_path, encoding='utf-8', index_col=0)
         if self.__m_d == '-12-31':
-            data = data[data['上市日期'] < (self.__year - 1) * 10000]
+            data = data[data['上市日期'] < (self.__year - 3) * 10000]
         else:
-            data = data[data['上市日期'] < (self.__year - 2) * 10000]
+            data = data[data['上市日期'] < (self.__year - 4) * 10000]
 
         data = data[data['上市日期'] > 1989 * 10000]
 
@@ -130,7 +130,8 @@ class stock_sum():
 
                 zcfzb_data = pd.read_csv(os.path.join(os.path.join(self.__floder, 'zcfzb'), code + '.csv'), encoding='gbk', index_col=0)
                 zcfzb_data = zcfzb_data.T
-
+                
+                pingjun_guxi = 0
                 for i in range(year - 3, year + 1):
                     data.loc[index, '有息负债(万元)' + str(i)] = \
                         float('--' == zcfzb_data['短期借款(万元)'][str(i) + self.__m_d] and 0.00001 or
@@ -185,10 +186,26 @@ class stock_sum():
                     data.loc[index, '负债合计(万元)' + str(i)] = \
                         float('--' == zcfzb_data['负债合计(万元)'][str(i) + self.__m_d] and 0.00001 \
                               or zcfzb_data['负债合计(万元)'][str(i) + self.__m_d])
+                    
+                    if self.__m_d == '-12-31':
+                        data.loc[index, '应付股利(万元)' + str(i)] = \
+                            max(float('--' == zcfzb_data['应付股利(万元)'][str(i) + self.__m_d] and 0.00001 or zcfzb_data['应付股利(万元)'][str(i) + self.__m_d]) \
+                            , float('--' == zcfzb_data['应付股利(万元)'][str(i) + '-09-30'] and 0.00001 or zcfzb_data['应付股利(万元)'][str(i) + '-09-30']) \
+                            , float('--' == zcfzb_data['应付股利(万元)'][str(i) + '-06-30'] and 0.00001 or zcfzb_data['应付股利(万元)'][str(i) + '-06-30']) \
+                            , float('--' == zcfzb_data['应付股利(万元)'][str(i) + '-03-31'] and 0.00001 or zcfzb_data['应付股利(万元)'][str(i) + '-03-31']))
+
+                    else:
+                        data.loc[index, '应付股利(万元)' + str(i)] = \
+                            float('--' == zcfzb_data['应付股利(万元)'][str(i) + self.__m_d] and 0.00001 \
+                                  or zcfzb_data['应付股利(万元)'][str(i) + self.__m_d])
+
+                    pingjun_guxi += data['应付股利(万元)' + str(i)][index]
 
                     data.loc[index, '存货(万元)' + str(i)] = \
                         float('--' == zcfzb_data['存货(万元)'][str(i) + self.__m_d] and 0.00001 \
                               or zcfzb_data['存货(万元)'][str(i) + self.__m_d])
+
+                data.loc[index, '平均股息(万元)'] = pingjun_guxi / 4
 
                 lrb_data = pd.read_csv(os.path.join(os.path.join(self.__floder, 'lrb'), code + '.csv'), encoding='gbk', index_col=0)
                 lrb_data = lrb_data.T
