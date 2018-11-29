@@ -105,11 +105,10 @@ def operation_func(data, year):
     data['二十倍市盈率'] = data['每股平均利润'] * 20
     data['二十倍市盈率'] = data['二十倍市盈率'].round(1)
 
-    data = data[['名字', '行业', '地区', '评分', '每股平均利润', '阈值市盈率', '阈值净利率', '阈值毛利率', '价格', '二十倍市盈率',
+    data = data[['名字', '行业', '地区', '每股平均利润', '阈值市盈率', '阈值净利率', '阈值毛利率', '价格', '二十倍市盈率',
                  '买入六份', '买入四份', '买入三份', '买入两份', '买入一份', '静观其变',
                  '卖出一份', '卖出两份', '卖出三份', '卖出四份', '卖出六份', '卖出八份']]
 
-    data = data[data['评分'] > 400]
     data = data[data['价格'] < data['二十倍市盈率']]
 
     data.to_excel(os.path.join(out_folder, '%s操作策略.xlsx' % (today)))
@@ -117,150 +116,6 @@ def operation_func(data, year):
     data = data[data['价格'] < data['静观其变'] * 1.1]
 
     data.to_excel(os.path.join(out_folder, '%s可买入股票.xlsx' % (today)))
-
-def score_func(data, year):
-    data['评分'] = 0
-    for index, row in data.iterrows():
-        scroe_sum = 0
-
-        for i in range(year - 2, year + 1):
-            tiaojian = row['利润总额(万元)' + str(i)] / row['生产资产(万元)' + str(i)]
-            if tiaojian > 0.3:
-                scroe_sum += 20
-            elif tiaojian > 0.1:
-                scroe_sum += 10
-            else:
-                scroe_sum -= 20
-
-            tiaojian = row['非主业资产(万元)' + str(i)] / row['资产总计(万元)' + str(i)]
-            if tiaojian < 0.05:
-                scroe_sum += 20
-            elif tiaojian < 0.1:
-                scroe_sum += 10
-            else:
-                scroe_sum -= 20
-
-            tiaojian = row['应收款(万元)' + str(i)] / row['资产总计(万元)' + str(i)]
-            if tiaojian < 0.1:
-                scroe_sum += 50
-            elif tiaojian < 0.3:
-                scroe_sum += 20
-            else:
-                scroe_sum -= 50
-
-            tiaojian = row['有息负债(万元)' + str(i)] / row['资产总计(万元)' + str(i)]
-            if tiaojian < 0.4:
-                scroe_sum += 20
-            elif tiaojian < 0.6:
-                scroe_sum += 10
-            else:
-                scroe_sum -= 20
-
-            tiaojian = row['其他应收款(万元)' + str(i)] / row['平均利润(万元)']
-            if tiaojian < 0.05:
-                scroe_sum += 50
-            elif tiaojian < 0.2:
-                scroe_sum += 20
-            else:
-                scroe_sum -= 50
-
-            tiaojian = row['其他应付款(万元)' + str(i)] / row['平均利润(万元)']
-            if tiaojian < 0.1:
-                scroe_sum += 20
-            elif tiaojian < 0.3:
-                scroe_sum += 10
-            else:
-                scroe_sum -= 20
-
-            tiaojian = abs(row['资产减值损失(万元)' + str(i)] / row['平均利润(万元)'])
-            if tiaojian < 0.2:
-                scroe_sum += 20
-            elif tiaojian < 0.35:
-                scroe_sum += 10
-            else:
-                scroe_sum -= 20
-
-            tiaojian = row['货币资金(万元)' + str(i)] / (row['有息负债(万元)' + str(i)] + 0.00001)
-            if tiaojian > 1:
-                scroe_sum += 50
-            elif tiaojian > 0.8:
-                scroe_sum += 20
-            else:
-                scroe_sum -= 50
-
-            tiaojian = abs(row['营业外收入(万元)' + str(i)]) / abs(row['营业总收入(万元)' + str(i)])
-            if tiaojian < 0.1:
-                scroe_sum += 20
-            elif tiaojian < 0.2:
-                scroe_sum += 10
-            else:
-                scroe_sum -= 20
-
-            tiaojian = abs(row['营业外支出(万元)' + str(i)]) / abs(row['营业总成本(万元)' + str(i)])
-            if tiaojian < 0.1:
-                scroe_sum += 20
-            elif tiaojian < 0.2:
-                scroe_sum += 10
-            else:
-                scroe_sum -= 20
-
-            tiaojian = row['毛利率(%)' + str(i)]
-            if tiaojian > 50:
-                scroe_sum += 50
-            elif tiaojian > 20:
-                scroe_sum += 20
-            else:
-                scroe_sum -= 50
-
-            tiaojian = row['费用总和(万元)' + str(i)] / (row['营业总收入(万元)' + str(i)] - row['营业总成本(万元)' + str(i)] + 0.00001)
-            if tiaojian < 0.6:
-                scroe_sum += 50
-            elif tiaojian < 0.8:
-                scroe_sum += 20
-            else:
-                scroe_sum -= 50
-
-            tiaojian = row['经营活动产生的现金流量净额(万元)' + str(i)] / abs(row['投资活动产生的现金流量净额(万元)' + str(i)])
-            if tiaojian > 2:
-                scroe_sum += 10
-            elif tiaojian > 0.5:
-                scroe_sum += 50
-            else:
-                scroe_sum -= 10
-
-            tiaojian = row['经营活动产生的现金流量净额(万元)' + str(i)] / row['净利润(万元)' + str(i)]
-            if tiaojian > 2:
-                scroe_sum += 30
-            elif tiaojian > 1:
-                scroe_sum += 10
-            else:
-                scroe_sum -= 30
-
-            tiaojian = row['现金及现金等价物的净增加额(万元)' + str(i)]
-            if tiaojian > 0:
-                scroe_sum += 10
-            else:
-                scroe_sum -= 10
-
-            tiaojian = row['净利润增长率(%)' + str(i)]
-            if tiaojian > 10:
-                scroe_sum += 50
-            elif tiaojian > 0:
-                scroe_sum += 20
-            else:
-                scroe_sum -= 50
-
-        tiaojian = row['利润同比(%)']
-        if tiaojian > 20:
-            scroe_sum += 50
-        elif tiaojian > 0:
-            scroe_sum += 20
-        else:
-            scroe_sum -= 50
-
-        data.loc[index, '评分'] = scroe_sum
-    return data
-
 
 def filter_stock_by_cwbb(year):
     gplb = s_sum.get_summary_report_data()
@@ -313,7 +168,6 @@ def filter_stock_by_cwbb(year):
     gplb = gplb[gplb['毛利率(%)' + str(year)] + gplb['毛利率(%)' + str(year - 1)] + gplb['毛利率(%)' + str(year - 2)] + gplb['毛利率(%)' + str(year - 3)] > 50]
     gplb = gplb[gplb['平均利润率'] > 22]
 
-    gplb = score_func(gplb, year)
 
     file = os.path.join(out_folder, '%s%s财务报表评分后的公司%s.csv' % (calcu_end_year, month_day, today))
     gplb.to_csv(file, encoding='utf-8')
@@ -325,7 +179,7 @@ def filter_stock_by_average_pe(src_path, min, max):
     data = pd.read_csv(src_path, index_col=0, encoding='utf-8')
 
     data = data[
-        ['名字', '价格', '行业', '地区', '总股本', '总资产(万)', '市净率', '每股平均利润', '平均市盈率', '平均股息率', '平均利润率', '利润同比(%)', '毛利率(%)', '净利润率(%)', '平均利润(万元)', '净利润增长率(%)'+ str(calcu_end_year - 2), '净利润增长率(%)'+ str(calcu_end_year - 1), '净利润增长率(%)'+ str(calcu_end_year), '评分']]
+        ['名字', '价格', '行业', '地区', '总股本', '总资产(万)', '市净率', '每股平均利润', '平均市盈率', '平均股息率', '平均利润率', '利润同比(%)', '毛利率(%)', '净利润率(%)', '平均利润(万元)', '净利润增长率(%)'+ str(calcu_end_year - 2), '净利润增长率(%)'+ str(calcu_end_year - 1), '净利润增长率(%)'+ str(calcu_end_year)]]
 
     print('\n%s:' % today)
     print()
