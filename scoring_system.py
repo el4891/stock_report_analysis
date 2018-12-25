@@ -155,10 +155,9 @@ def filter_stock_by_cwbb(year):
         #gplb = gplb[abs(gplb['营业外支出(万元)' + str(i)]) / abs(gplb['营业总成本(万元)' + str(i)]) < 0.4]
 
         #gplb = gplb[gplb['费用总和(万元)' + str(i)] / (gplb['营业总收入(万元)' + str(i)] - gplb['营业总成本(万元)' + str(i)]) < 1.1]
-        gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] > 10000]
-        gplb = gplb[gplb['净利润(万元)' + str(i)] > 10000]
+        gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] > 5000]
+        gplb = gplb[gplb['净利润(万元)' + str(i)] > 5000]
 
-        gplb = gplb[gplb['净利润(万元)' + str(i)] < 1000000]
         #gplb = gplb[gplb['净利润增长率(%)'+ str(i)] > 0]
         #gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] / abs(gplb['投资活动产生的现金流量净额(万元)' + str(i)]) > 0.4]
 
