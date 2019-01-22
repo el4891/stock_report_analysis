@@ -161,6 +161,9 @@ def filter_stock_by_cwbb(year):
         #gplb = gplb[gplb['净利润增长率(%)'+ str(i)] > 0]
         #gplb = gplb[gplb['经营活动产生的现金流量净额(万元)' + str(i)] / abs(gplb['投资活动产生的现金流量净额(万元)' + str(i)]) > 0.4]
 
+    gplb = gplb[gplb['现金及现金等价物的净增加额(万元)' + str(year)] + gplb['现金及现金等价物的净增加额(万元)' + str(year - 1)]
+                + gplb['现金及现金等价物的净增加额(万元)' + str(year - 2)] + gplb['现金及现金等价物的净增加额(万元)' + str(year - 3)]> 0]
+
     gplb = gplb[gplb['应收款(万元)' + str(year)] / gplb['资产总计(万元)' + str(year)] < 0.2]
     gplb = gplb[gplb['货币资金(万元)' + str(year)] + (gplb['流动资产合计(万元)' + str(year)] - gplb['货币资金(万元)' + str(year)]) / 1.5 > gplb['负债合计(万元)' + str(year)] * 0.9]
 
