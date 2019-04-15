@@ -276,11 +276,19 @@ class stock_sum():
                     data.loc[index, '净利润增长率(%)' + str(i)] = (lirun_now - lirun_lastyear) * 100 / lirun_lastyear
 
             except Exception as e:
-                os.remove(os.path.join(os.path.join(self.__floder, 'lrb'), code + '.csv'))
-                os.remove(os.path.join(os.path.join(self.__floder, 'xjllb'), code + '.csv'))
-                os.remove(os.path.join(os.path.join(self.__floder, 'zcfzb'), code + '.csv'))
+                try:
+                    os.remove(os.path.join(os.path.join(self.__floder, 'lrb'), code + '.csv'))
+                except Exception as e:
+
+                try:
+                    os.remove(os.path.join(os.path.join(self.__floder, 'xjllb'), code + '.csv'))
+                except Exception as e:
+
+                try:
+                    os.remove(os.path.join(os.path.join(self.__floder, 'zcfzb'), code + '.csv'))
+                except Exception as e:
+
                 print(code)
-                print(str(e))
 
         return data
 
