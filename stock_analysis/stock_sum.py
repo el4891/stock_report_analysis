@@ -279,15 +279,15 @@ class stock_sum():
                 try:
                     os.remove(os.path.join(os.path.join(self.__floder, 'lrb'), code + '.csv'))
                 except Exception as e:
-
+                    e.message
                 try:
                     os.remove(os.path.join(os.path.join(self.__floder, 'xjllb'), code + '.csv'))
                 except Exception as e:
-
+                    e.message
                 try:
                     os.remove(os.path.join(os.path.join(self.__floder, 'zcfzb'), code + '.csv'))
                 except Exception as e:
-
+                    e.message
                 print(code)
 
         return data
